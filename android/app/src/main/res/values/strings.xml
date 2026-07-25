@@ -120,6 +120,13 @@
     <string name="settings_auto_load_state_sub">Keep three rotating autosaves without replacing manual slots</string>
     <string name="settings_confirm_reset">Confirm before reset</string>
     <string name="settings_confirm_reset_sub">Prevent accidental restarts from the game menu</string>
+    <string name="settings_export_saves">Export saves</string>
+    <string name="settings_export_saves_sub">Copy cartridge saves and save states to a ZIP file</string>
+    <plurals name="settings_export_complete">
+        <item quantity="one">Exported %1$d save file</item>
+        <item quantity="other">Exported %1$d save files</item>
+    </plurals>
+    <string name="settings_export_failed">Could not export saves</string>
     <string name="settings_gamepad">Gamepad buttons</string>
     <string name="settings_gamepad_sub">Remap a connected controller</string>
     <string name="gamepad_title">Gamepad buttons</string>

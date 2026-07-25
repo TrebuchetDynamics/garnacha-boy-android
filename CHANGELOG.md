@@ -6,6 +6,10 @@ All notable changes to Garnacha Boy are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+- Added a Settings action that exports cartridge saves and save states to a
+  user-chosen ZIP file without storage permissions or cloud access.
+
 ## [0.6.2] — 2026-07-25
 
 ### Changed

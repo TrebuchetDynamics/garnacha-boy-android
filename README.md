@@ -35,6 +35,7 @@ Import a `.gb`, `.gbc`, `.gba`, or ZIP file through Android's document picker. G
 
 - **Game Boy, Game Boy Color, and Game Boy Advance** through pinned, unmodified [mGBA](https://github.com/mgba-emu/mgba) `0.10.5`
 - **Cartridge saves** plus four manual save-state slots
+- **Save export** to a user-chosen ZIP file
 - **Rotating autosaves** for resume and recovery
 - **Rewind and fast-forward** from the in-game menu
 - **Touch and physical controls** with remapping support

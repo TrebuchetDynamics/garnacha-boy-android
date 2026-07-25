@@ -2,6 +2,7 @@ package com.trebuchetdynamics.emulator.app;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -13,6 +14,9 @@ import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+import java.io.IOException;
+import java.io.OutputStream;
 
 public final class SettingsActivity extends Activity {
     private static final int HOME = 0;
@@ -21,6 +25,7 @@ public final class SettingsActivity extends Activity {
     private static final int CONTROLS = 3;
     private static final int STATES = 4;
     private static final int EMULATION = 5;
+    private static final int EXPORT_SAVES = 100;
 
     private Settings settings;
     private LinearLayout content;
@@ -113,6 +118,8 @@ public final class SettingsActivity extends Activity {
                 content.addView(switchRow(getString(R.string.settings_confirm_reset),
                         getString(R.string.settings_confirm_reset_sub), settings.confirmReset(),
                         (b, on) -> settings.setConfirmReset(on)));
+                content.addView(choiceRow(getString(R.string.settings_export_saves),
+                        getString(R.string.settings_export_saves_sub), v -> exportSaves()));
                 break;
             case EMULATION:
                 page(R.string.settings_group_emulation, R.string.settings_group_emulation_sub);
@@ -141,6 +148,33 @@ public final class SettingsActivity extends Activity {
         }
         content.addView(pageTitle(getString(title)));
         content.addView(pageIntro(getString(intro)));
+    }
+
+    private void exportSaves() {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT)
+                .addCategory(Intent.CATEGORY_OPENABLE)
+                .setType("application/zip")
+                .putExtra(Intent.EXTRA_TITLE, "garnacha-boy-saves.zip");
+        startActivityForResult(intent, EXPORT_SAVES);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != EXPORT_SAVES || resultCode != RESULT_OK
+                || data == null || data.getData() == null) {
+            return;
+        }
+        try (OutputStream out = getContentResolver().openOutputStream(data.getData())) {
+            if (out == null) {
+                throw new IOException("Could not open the selected file");
+            }
+            int count = SaveBackup.write(getFilesDir(), out);
+            Toast.makeText(this, getResources().getQuantityString(
+                    R.plurals.settings_export_complete, count, count), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Toast.makeText(this, R.string.settings_export_failed, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
