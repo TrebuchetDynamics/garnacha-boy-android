@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="340" viewBox="0 0 1200 340" role="img" aria-labelledby="title desc">
+  <title id="title">How Garnacha Boy handles a game</title>
+  <desc id="desc">A game file is imported into a private library, played through mGBA, and saved locally without a network connection.</desc>
+
+  <rect width="1200" height="340" rx="28" fill="#151820"/>
+  <path d="M285 148 H330 M570 148 H615 M855 148 H900" stroke="#565D69" stroke-width="3" stroke-linecap="round"/>
+  <path d="M321 140 L331 148 L321 156 M606 140 L616 148 L606 156 M891 140 L901 148 L891 156" fill="none" stroke="#F5C542" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <g id="import" transform="translate(48 44)">
+    <text x="0" y="0" dominant-baseline="hanging" fill="#F5C542" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700" letter-spacing="2">01 / IMPORT</text>
+    <rect x="0" y="44" width="220" height="164" rx="18" fill="#20242C" stroke="#3B414C" stroke-width="2"/>
+    <path d="M70 76 H136 L165 105 V175 H70 Z" fill="none" stroke="#FFF9EE" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M136 76 V105 H165" fill="none" stroke="#FFF9EE" stroke-width="4" stroke-linejoin="round"/>
+    <text x="117" y="145" fill="#D7D9DE" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" font-weight="700" text-anchor="middle">.GB / .ZIP</text>
+    <text x="110" y="238" fill="#AAB0BA" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" text-anchor="middle">Android file picker</text>
+  </g>
+
+  <g id="library" transform="translate(333 44)">
+    <text x="0" y="0" dominant-baseline="hanging" fill="#F5C542" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700" letter-spacing="2">02 / LIBRARY</text>
+    <rect x="0" y="44" width="220" height="164" rx="18" fill="#20242C" stroke="#3B414C" stroke-width="2"/>
+    <rect x="28" y="72" width="164" height="32" rx="9" fill="#2C313A"/>
+    <rect x="28" y="112" width="164" height="32" rx="9" fill="#2C313A"/>
+    <rect x="28" y="152" width="164" height="32" rx="9" fill="#2C313A"/>
+    <circle cx="48" cy="88" r="7" fill="#8E315A"/>
+    <circle cx="48" cy="128" r="7" fill="#A64067"/>
+    <circle cx="48" cy="168" r="7" fill="#7B274C"/>
+    <text x="68" y="94" fill="#FFF9EE" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17">GB</text>
+    <text x="68" y="134" fill="#FFF9EE" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17">GBC</text>
+    <text x="68" y="174" fill="#FFF9EE" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17">GBA</text>
+    <text x="110" y="238" fill="#AAB0BA" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" text-anchor="middle">Private app storage</text>
+  </g>
+
+  <g id="play" transform="translate(618 44)">
+    <text x="0" y="0" dominant-baseline="hanging" fill="#F5C542" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700" letter-spacing="2">03 / PLAY</text>
+    <rect x="0" y="44" width="220" height="164" rx="18" fill="#20242C" stroke="#3B414C" stroke-width="2"/>
+    <rect x="25" y="70" width="170" height="108" rx="10" fill="#090A0D" stroke="#565D69" stroke-width="3"/>
+    <rect x="50" y="94" width="120" height="60" fill="#2B3038"/>
+    <path d="M98 116 H108 V106 H120 V116 H130 V128 H120 V138 H108 V128 H98 Z" fill="#F5C542"/>
+    <circle cx="148" cy="116" r="11" fill="#A64067"/>
+    <circle cx="160" cy="136" r="11" fill="#7B274C"/>
+    <text x="110" y="238" fill="#AAB0BA" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" text-anchor="middle">mGBA 0.10.5</text>
+  </g>
+
+  <g id="save" transform="translate(903 44)">
+    <text x="0" y="0" dominant-baseline="hanging" fill="#F5C542" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="17" font-weight="700" letter-spacing="2">04 / SAVE</text>
+    <rect x="0" y="44" width="249" height="164" rx="18" fill="#20242C" stroke="#3B414C" stroke-width="2"/>
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" font-weight="700">
+      <rect x="24" y="73" width="201" height="30" rx="9" fill="#2C313A"/>
+      <text x="40" y="94" fill="#FFF9EE">CARTRIDGE .SAV</text>
+      <rect x="24" y="112" width="201" height="30" rx="9" fill="#2C313A"/>
+      <text x="40" y="133" fill="#FFF9EE">4 MANUAL STATES</text>
+      <rect x="24" y="151" width="201" height="30" rx="9" fill="#2C313A"/>
+      <text x="40" y="172" fill="#FFF9EE">ROTATING AUTO</text>
+    </g>
+    <text x="124" y="238" fill="#AAB0BA" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="17" text-anchor="middle">On-device progress</text>
+  </g>
+
+  <g transform="translate(48 304)">
+    <circle cx="8" cy="0" r="7" fill="#A64067"/>
+    <text x="26" y="6" fill="#D7D9DE" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="16" letter-spacing="1">NO INTERNET PERMISSION / NO ACCOUNT / NO CLOUD HOP</text>
+  </g>
+</svg>
