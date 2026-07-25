@@ -1,0 +1,7 @@
+mGBA 0.10.5
+Copyright Jeffrey Pfau and mGBA contributors
+License: Mozilla Public License 2.0
+Source: https://github.com/mgba-emu/mgba/tree/26b7884bc25a5933960f3cdcd98bac1ae14d42e2
+
+Garnacha Boy uses this pinned mGBA revision without source modifications.
+The full MPL-2.0 text is provided in META-INF/LICENSE-mGBA.

@@ -6,6 +6,13 @@ All notable changes to Garnacha Boy are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+- Renamed the project-owned Android workspace from `mgba-android/` to
+  `android/` without changing package or native-library identifiers.
+- Clarified that Garnacha-owned code is MIT-licensed while mGBA remains under
+  MPL-2.0, added exact-source notices, and added recursive source archives to
+  the release workflow.
+
 ## [0.6.0] — 2026-07-24
 
 ### Added

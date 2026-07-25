@@ -110,6 +110,18 @@ jobs:
           echo "Signing cert verified against the Garnacha release key."
           mv "${APK}" "garnacha-boy-${GITHUB_REF_NAME}.apk"
 
+      - name: Package corresponding source
+        run: |
+          set -euo pipefail
+          ROOT="garnacha-boy-${GITHUB_REF_NAME}"
+          git archive --format=tar --prefix="${ROOT}/" HEAD > source.tar
+          git -C vendor/mgba archive --format=tar \
+            --prefix="${ROOT}/vendor/mgba/" HEAD > mgba.tar
+          tar --concatenate --file=source.tar mgba.tar
+          gzip -9n source.tar
+          mv source.tar.gz "${ROOT}-source.tar.gz"
+          rm mgba.tar
+
       - name: Shred the signing material
         if: always()
         run: |
@@ -119,7 +131,9 @@ jobs:
       - name: Publish the draft release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
-          files: garnacha-boy-*.apk
+          files: |
+            garnacha-boy-*.apk
+            garnacha-boy-*-source.tar.gz
           body_path: CHANGELOG.md
           draft: true
           prerelease: true
