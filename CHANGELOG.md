@@ -6,6 +6,8 @@ All notable changes to Garnacha Boy are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.6.1] — 2026-07-25
+
 ### Changed
 - Renamed the project-owned Android workspace from `mgba-android/` to
   `android/` without changing package or native-library identifiers.

@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/TrebuchetDynamics/garnacha-boy-android/tree/v0.6.0"><strong>Source v0.6.0</strong></a> ·
+  <a href="https://github.com/TrebuchetDynamics/garnacha-boy-android/tree/v0.6.1"><strong>Source v0.6.1</strong></a> ·
   <a href="#see-it-running">Screens</a> ·
   <a href="#from-file-to-save">How it works</a> ·
   <a href="#built-to-stay-offline">Privacy</a> ·
@@ -17,9 +17,9 @@
 
 ## Release status
 
-**The `v0.6.0` source is tagged, but an official signed APK is not published yet.** Production signing is not configured, so the release pipeline stops before building or uploading an APK.
+**Latest release: [`v0.6.1`](https://github.com/TrebuchetDynamics/garnacha-boy-android/releases/tag/v0.6.1).** Download the production-signed APK and corresponding source archive from GitHub Releases.
 
-Official builds will appear only on [GitHub Releases](https://github.com/TrebuchetDynamics/garnacha-boy-android/releases). Until one is listed there, treat Garnacha Boy as source-only and do not trust APKs distributed elsewhere.
+Trust official builds only from [GitHub Releases](https://github.com/TrebuchetDynamics/garnacha-boy-android/releases); do not install APKs distributed elsewhere.
 
 ## See it running
 
@@ -89,7 +89,6 @@ Garnacha Boy's Android manifest intentionally has **no `INTERNET` permission**. 
 - Games and proprietary BIOS files are not included. Supply only content you are legally authorized to use.
 - Bluetooth and USB controller remapping exists, but physical-controller coverage remains limited.
 - Battery life, sustained thermals, and low-end Android performance remain unverified.
-- There is currently no production-signed public APK.
 
 ## Build from source
 
