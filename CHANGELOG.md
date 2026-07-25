@@ -6,6 +6,12 @@ All notable changes to Garnacha Boy are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.6.2] — 2026-07-25
+
+### Changed
+- Asked Android 10 and newer to offer keeping the on-device game library,
+  saves, states, and settings when Garnacha Boy is uninstalled.
+
 ## [0.6.1] — 2026-07-25
 
 ### Changed

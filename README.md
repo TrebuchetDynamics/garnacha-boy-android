@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/TrebuchetDynamics/garnacha-boy-android/tree/v0.6.1"><strong>Source v0.6.1</strong></a> ·
+  <a href="https://github.com/TrebuchetDynamics/garnacha-boy-android/tree/v0.6.2"><strong>Source v0.6.2</strong></a> ·
   <a href="#see-it-running">Screens</a> ·
   <a href="#from-file-to-save">How it works</a> ·
   <a href="#built-to-stay-offline">Privacy</a> ·
@@ -17,7 +17,7 @@
 
 ## Release status
 
-**Latest release: [`v0.6.1`](https://github.com/TrebuchetDynamics/garnacha-boy-android/releases/tag/v0.6.1).** Download the production-signed APK and corresponding source archive from GitHub Releases.
+**Latest release: [`v0.6.2`](https://github.com/TrebuchetDynamics/garnacha-boy-android/releases/tag/v0.6.2).** Download the production-signed APK and corresponding source archive from GitHub Releases.
 
 Trust official builds only from [GitHub Releases](https://github.com/TrebuchetDynamics/garnacha-boy-android/releases); do not install APKs distributed elsewhere.
 
@@ -75,7 +75,7 @@ Garnacha Boy's Android manifest intentionally has **no `INTERNET` permission**. 
 | Screenshots | Android Pictures collection |
 | Network traffic | None—the app has no network permission |
 
-> App backup is disabled. Uninstalling Garnacha Boy—or deleting a game from its library—removes its private copy and associated saves. Keep your own backups.
+> Cloud backup is disabled. On Android 10 or newer, the uninstall screen asks whether to keep Garnacha Boy's on-device data. Choose **Keep app data** to retain the library, saves, states, and settings for reinstalling; deleting a game from the library still removes its private copy and associated saves.
 
 ## Compatibility and limits
 
