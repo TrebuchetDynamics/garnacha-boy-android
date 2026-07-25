@@ -6,7 +6,7 @@
 
 **Architecture:** A new `RomLibrary` (pure java.io) enumerates the private ROM files and tracks a display name + last-played time per ROM in a properties index, and cascades a delete to the ROM plus its cartridge save and save states. The SAF import logic moves out of `MainActivity` into a reusable `RomImporter` that also records the imported ROM into the library. A new `LibraryActivity` becomes the launcher: it lists the library, imports, and deletes, and starts `MainActivity` with a ROM id. `MainActivity` is refactored to play the ROM named by that id (and bump its last-played time), dropping its own picker/empty-state. Control geometry, the in-game menu, save states, and play-feel are untouched.
 
-**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), Storage Access Framework, programmatic Views (the codebase's no-XML pattern), `java.util.Properties`, JUnit 4 (JVM), Gradle via `mgba-android/gradlew`.
+**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), Storage Access Framework, programmatic Views (the codebase's no-XML pattern), `java.util.Properties`, JUnit 4 (JVM), Gradle via `android/gradlew`.
 
 ## Global Constraints
 
@@ -36,8 +36,8 @@ Package for all `.../app/` files: `com.trebuchetdynamics.emulator.app`.
 ### Task 1: RomLibrary — enumeration, metadata, cascade delete
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomLibrary.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/RomLibraryTest.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomLibrary.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/RomLibraryTest.java`
 
 **Interfaces:**
 - Produces:
@@ -171,7 +171,7 @@ public class RomLibraryTest {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*RomLibraryTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*RomLibraryTest'
 ```
 Expected: FAIL — `RomLibrary` does not exist.
 
@@ -338,15 +338,15 @@ final class RomLibrary {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*RomLibraryTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*RomLibraryTest'
 ```
 Expected: PASS (7 tests).
 
 - [ ] **Step 5: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomLibrary.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/RomLibraryTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomLibrary.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/RomLibraryTest.java
 git commit -m "feat(app): ROM library index — enumerate, metadata, cascade delete
 
 Pure java.io: lists private ROMs most-recently-played first, tracks display
@@ -361,8 +361,8 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: RomImporter — extract SAF import and record into the library
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomImporter.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomImporter.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
 
 **Interfaces:**
 - Consumes: `RomArchive.extractRom(InputStream, OutputStream, long)` (existing); `RomLibrary.record(String, String, long)` (Task 1).
@@ -503,15 +503,15 @@ Delete the now-unused private `importRom(Uri)` method, the `hex(byte[])` method,
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass (prior + Task 1's 7 RomLibrary). The app still builds and imports as before, now also recording each import into the library index.
 
 - [ ] **Step 4: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomImporter.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomImporter.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
 git commit -m "refactor(app): extract ROM import into RomImporter, record into library
 
 The SAF import (zip-aware extract, atomic hash-named private file) moves out of
@@ -526,7 +526,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: MainActivity plays a ROM named by intent id
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
 
 **Interfaces:**
 - Consumes: `RomLibrary.touch(String, long)` (Task 1).
@@ -560,14 +560,14 @@ In `onCreate`, after `library = new RomLibrary(getFilesDir());`, if an id was pa
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass. Launched normally the app behaves as before; launched with `EXTRA_ROM_ID` it will play that ROM (exercised on device after Task 4).
 
 - [ ] **Step 3: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
 git commit -m "feat(app): MainActivity can play a ROM named by intent id
 
 Launched with EXTRA_ROM_ID, the player loads that library ROM and bumps its
@@ -581,10 +581,10 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: LibraryActivity as launcher; MainActivity becomes player-only
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
-- Modify: `mgba-android/app/src/main/AndroidManifest.xml`
-- Modify: `mgba-android/app/src/main/res/values/strings.xml`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/AndroidManifest.xml`
+- Modify: `android/app/src/main/res/values/strings.xml`
 
 **Interfaces:**
 - Consumes: `RomLibrary` (Task 1), `RomImporter` (Task 2), `MainActivity.EXTRA_ROM_ID` (Task 3).
@@ -839,17 +839,17 @@ In `AndroidManifest.xml`, move the `MAIN`/`LAUNCHER` intent-filter from `MainAct
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass. The app now launches into the library; importing adds a row; tapping a row plays; long-press deletes.
 
 - [ ] **Step 6: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
-        mgba-android/app/src/main/AndroidManifest.xml \
-        mgba-android/app/src/main/res/values/strings.xml
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
+        android/app/src/main/AndroidManifest.xml \
+        android/app/src/main/res/values/strings.xml
 git commit -m "feat(app): library-first — LibraryActivity launcher, MainActivity plays by id
 
 The app now opens to a list of imported ROMs (most-recently-played first) with
@@ -874,7 +874,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 With the device connected:
 ```sh
-adb install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+adb install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
 adb shell am start -n com.trebuchetdynamics.garnacha/com.trebuchetdynamics.emulator.app.LibraryActivity
 ```
 Confirm, capturing screenshots:

@@ -3,7 +3,7 @@
 Device: **clean x86_64 AVD** (`game-emulator-mvp`) — used because the physical
 device's foreground contention blocked prior interactive verification.
 Build: `app-benchmark.apk` from commit `406c0f72` (Task 6 + the GB-dimensions fix).
-Test ROMs (added under `mgba-android/core/src/androidTest/assets/`, provenance in
+Test ROMs (added under `android/core/src/androidTest/assets/`, provenance in
 that dir's `NOTICE.md`):
 - `hello.gb` — blargg `dmg_sound/01-registers` (DMG, CGB flag 0x00), public domain.
 - `hello.gbc` — blargg `interrupt_time` (CGB flag 0xC0), public domain.

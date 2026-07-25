@@ -17,17 +17,17 @@ No game or proprietary BIOS content is bundled in the application.
 
 ```sh
 git submodule update --init --depth 1
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake -S android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build/mgba-smoke
 ctest --test-dir build/mgba-smoke --output-on-failure
 # Optional repeatable core throughput measurement:
 build/mgba-smoke/mgba-core-benchmark \
-  mgba-android/core/src/androidTest/assets/hello.gba 30000
+  android/core/src/androidTest/assets/hello.gba 30000
 
-mgba-android/gradlew -p mgba-android clean lintDebug \
+android/gradlew -p android clean lintDebug \
   :app:assembleBenchmark :core:assembleBenchmark :core:assembleDebugAndroidTest
 # With an emulator/device connected, run correctness tests against the debug core:
-ANDROID_SERIAL=<serial> mgba-android/gradlew -p mgba-android \
+ANDROID_SERIAL=<serial> android/gradlew -p android \
   :core:connectedDebugAndroidTest
 ```
 
@@ -35,7 +35,7 @@ For product-owned native lifecycle checks under AddressSanitizer and
 UndefinedBehaviorSanitizer:
 
 ```sh
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja \
+cmake -S android/smoke -B build/mgba-smoke -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug -DGARNACHA_SANITIZERS=ON
 cmake --build build/mgba-smoke
 ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
@@ -53,21 +53,21 @@ start a user-owned GBA game with normal speed, audio on, frameskip 0, rewind
 on, and fixed brightness. After one minute of warm-up:
 
 ```sh
-mgba-android/gradlew -p mgba-android :app:assembleBenchmark
+android/gradlew -p android :app:assembleBenchmark
 adb -s RFCX81EJPNN install -r \
-  mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+  android/app/build/outputs/apk/benchmark/app-benchmark.apk
 export ANDROID_SERIAL=RFCX81EJPNN
 export OUT_DIR=build/perf
-mgba-android/tools/measure-session.sh profile-start
+android/tools/measure-session.sh profile-start
 # Play the same representative segment for at least 10 minutes.
-mgba-android/tools/measure-session.sh profile-collect baseline-1
+android/tools/measure-session.sh profile-collect baseline-1
 ```
 
 Repeat as `baseline-2` and `baseline-3`, cooling the device until starting
 battery temperatures are within 2°C, then summarize:
 
 ```sh
-mgba-android/tools/measure-session.sh profile-summary \
+android/tools/measure-session.sh profile-summary \
   build/perf/profile-baseline-1 \
   build/perf/profile-baseline-2 \
   build/perf/profile-baseline-3 | tee build/perf/baseline-summary.txt
@@ -79,8 +79,8 @@ or app-private data.
 
 Outputs:
 
-- optimized test app: `mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk`
-- optimized reusable core: `mgba-android/core/build/outputs/aar/core-benchmark.aar`
+- optimized test app: `android/app/build/outputs/apk/benchmark/app-benchmark.apk`
+- optimized reusable core: `android/core/build/outputs/aar/core-benchmark.aar`
 
 The benchmark variant is non-debuggable, compiles native code as `RelWithDebInfo` (`-O2`), and uses Android's debug signing key only so it can be installed for measurements. It is not a production-signed release.
 

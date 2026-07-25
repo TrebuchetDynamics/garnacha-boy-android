@@ -20,9 +20,9 @@
 - No change to the in-game menu save-state/notices/settings wiring beyond adding "Edit layout", to the ROM library/import/play-by-id contract, or to Phase 4a/4b behavior.
 - Commit trailer on every commit: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 - Build/test (from repo root):
-  - Unit tests: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest`
-  - Lint: `mgba-android/gradlew -p mgba-android lintDebug`
-  - Benchmark APK: `mgba-android/gradlew -p mgba-android :app:assembleBenchmark`
+  - Unit tests: `android/gradlew -p android :app:testDebugUnitTest`
+  - Lint: `android/gradlew -p android lintDebug`
+  - Benchmark APK: `android/gradlew -p android :app:assembleBenchmark`
 
 ## File Structure
 
@@ -37,8 +37,8 @@
 - `res/values/strings.xml` (modify) — editor strings.
 - Tests: `ControlOverridesTest.java`, `LayoutEditMathTest.java` (new); `ControlLayoutTest.java`, `SettingsTest.java` (extend).
 
-Test dir: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/`
-Main dir: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/`
+Test dir: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/`
+Main dir: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/`
 
 ---
 
@@ -136,7 +136,7 @@ public class ControlOverridesTest {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*ControlOverridesTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*ControlOverridesTest'`
 Expected: FAIL — `ControlOverrides` does not exist.
 
 - [ ] **Step 3: Implement `ControlOverrides`**
@@ -266,7 +266,7 @@ final class ControlOverrides {
 
 - [ ] **Step 4: Run `ControlOverrides` test to green**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*ControlOverridesTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*ControlOverridesTest'`
 Expected: PASS.
 
 - [ ] **Step 5: Write the failing `LayoutEditMath` test**
@@ -307,7 +307,7 @@ public class LayoutEditMathTest {
 
 - [ ] **Step 6: Run to verify it fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*LayoutEditMathTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*LayoutEditMathTest'`
 Expected: FAIL — `LayoutEditMath` does not exist.
 
 - [ ] **Step 7: Implement `LayoutEditMath`**
@@ -353,7 +353,7 @@ final class LayoutEditMath {
 
 - [ ] **Step 8: Run `LayoutEditMath` test to green**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*LayoutEditMathTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*LayoutEditMathTest'`
 Expected: PASS.
 
 - [ ] **Step 9: Write the failing `Settings` round-trip test**
@@ -377,7 +377,7 @@ Add `import static org.junit.Assert.assertEquals;` if not already present.
 
 - [ ] **Step 10: Run to verify it fails, then implement the `Settings` additions**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*SettingsTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*SettingsTest'`
 Expected: FAIL (compile) until the test's referenced types build — this test only needs `ControlOverrides` (from Step 3), so it should already pass once compiled; if it passes immediately that is acceptable (it documents the contract). Then add the `Settings` methods regardless.
 
 In `Settings.java`, add constants near the others:
@@ -401,18 +401,18 @@ Add the methods (after the gamepad bindings methods):
 
 - [ ] **Step 11: Full suite + lint**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug`
 Expected: all tests pass; lint 0 errors.
 
 - [ ] **Step 12: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlOverrides.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlOverridesTest.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditMath.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/LayoutEditMathTest.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlOverrides.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlOverridesTest.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditMath.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/LayoutEditMathTest.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java
 git commit -m "feat(app): control-override model and per-orientation persistence
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -520,7 +520,7 @@ Add to `ControlLayoutTest.java`:
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*ControlLayoutTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*ControlLayoutTest'`
 Expected: FAIL — `of(w, h, overrides)` does not exist.
 
 - [ ] **Step 3: Implement the overload + clamp**
@@ -587,19 +587,19 @@ with:
 
 - [ ] **Step 4: Run the tests to green**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*ControlLayoutTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*ControlLayoutTest'`
 Expected: PASS (new tests + all pre-existing `ControlLayoutTest` cases).
 
 - [ ] **Step 5: Full suite + lint**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug`
 Expected: all pass; lint 0 errors.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java
 git commit -m "feat(app): apply per-control overrides in ControlLayout
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -663,14 +663,14 @@ In `MainActivity.java`, in `onResume` next to the other `emulatorView.set…` pu
 
 - [ ] **Step 4: Build, test, lint, APK**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
 Expected: tests pass, lint 0 errors, APK assembles. Behavior is unchanged (no overrides stored → `EMPTY` → default layout).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
 git commit -m "feat(app): apply saved control overrides to the player view
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -952,16 +952,16 @@ In the `InGameMenuView.Listener` anonymous implementation (the `new InGameMenuVi
 
 - [ ] **Step 4: Build, test, lint, APK**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
 Expected: tests pass, lint 0 errors, APK assembles. The whole app compiles (the new `Listener.onEditLayout` is implemented in `MainActivity`).
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
-        mgba-android/app/src/main/res/values/strings.xml
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
+        android/app/src/main/res/values/strings.xml
 git commit -m "feat(app): WYSIWYG touch-layout editor from the in-game menu
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -984,8 +984,8 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 /usr/lib/android-sdk/emulator/emulator -avd game-emulator-mvp -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
 adb -s emulator-5554 wait-for-device
 # wait until sys.boot_completed == 1
-adb -s emulator-5554 install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
-adb -s emulator-5554 push mgba-android/core/src/androidTest/assets/hello.gba /sdcard/Download/hello.gba
+adb -s emulator-5554 install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
+adb -s emulator-5554 push android/core/src/androidTest/assets/hello.gba /sdcard/Download/hello.gba
 ```
 Import (SAF picker; media-scan the pushed file first if it does not appear:
 `adb -s emulator-5554 shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///sdcard/Download/hello.gba`) and launch the ROM.

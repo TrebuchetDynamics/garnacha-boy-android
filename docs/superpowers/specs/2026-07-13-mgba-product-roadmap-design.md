@@ -2,7 +2,7 @@
 
 - Date: 2026-07-13
 - Status: Approved (brainstorm 2026-07-13)
-- Scope: Roadmap for the custom mGBA Android product (`mgba-android/`) from its current audited state to a public 1.0 on Google Play, F-Droid, and GitHub Releases, plus the first post-launch release.
+- Scope: Roadmap for the custom mGBA Android product (`android/`) from its current audited state to a public 1.0 on Google Play, F-Droid, and GitHub Releases, plus the first post-launch release.
 
 ## Decisions made during brainstorming
 

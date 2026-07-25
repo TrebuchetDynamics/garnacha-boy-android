@@ -20,9 +20,9 @@
 - GBA key bitmasks (from `MgbaSession`): `KEY_A=1, KEY_B=2, KEY_SELECT=4, KEY_START=8, KEY_RIGHT=16, KEY_LEFT=32, KEY_UP=64, KEY_DOWN=128, KEY_R=256, KEY_L=512`.
 - Commit trailer on every commit: `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 - Build/test commands (run from repo root):
-  - Unit tests: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest`
-  - Lint: `mgba-android/gradlew -p mgba-android lintDebug`
-  - Benchmark APK: `mgba-android/gradlew -p mgba-android :app:assembleBenchmark`
+  - Unit tests: `android/gradlew -p android :app:testDebugUnitTest`
+  - Lint: `android/gradlew -p android lintDebug`
+  - Benchmark APK: `android/gradlew -p android :app:assembleBenchmark`
 
 ## File Structure
 
@@ -36,18 +36,18 @@
 - `AndroidManifest.xml`, `res/values/strings.xml` (modify).
 - Tests: `KeyBindingsTest.java` (new), `SettingsTest.java` / `EmulationRunnerTest.java` (extend).
 
-Test dir: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/`
-Main dir: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/`
+Test dir: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/`
+Main dir: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/`
 
 ---
 
 ### Task 1: Pure logic — `KeyBindings` + `Settings` additions
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/KeyBindings.java`
-- Create: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/KeyBindingsTest.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java`
-- Modify: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/KeyBindings.java`
+- Create: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/KeyBindingsTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java`
+- Modify: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java`
 
 **Interfaces:**
 - Produces: `KeyBindings` — `static KeyBindings of(Map<Integer,Integer>)`, `static KeyBindings parse(String, Map<Integer,Integer> defaults)`, `int gbaKeyFor(int keyCode)`, `void bind(int gbaKey, int keyCode)`, `int keyCodeFor(int gbaKey)`, `void reset(Map<Integer,Integer> defaults)`, `String serialize()`.
@@ -152,7 +152,7 @@ public class KeyBindingsTest {
 
 - [ ] **Step 2: Run the test to verify it fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*KeyBindingsTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*KeyBindingsTest'`
 Expected: FAIL — `KeyBindings` does not exist (compile error).
 
 - [ ] **Step 3: Implement `KeyBindings`**
@@ -265,7 +265,7 @@ final class KeyBindings {
 
 - [ ] **Step 4: Run the `KeyBindings` test to verify it passes**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*KeyBindingsTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*KeyBindingsTest'`
 Expected: PASS (8 tests).
 
 - [ ] **Step 5: Write the failing test for the `Settings` additions**
@@ -287,7 +287,7 @@ If (and only if) the existing `SettingsTest` already builds a real `Settings` in
 
 - [ ] **Step 6: Run to verify the new `Settings` test fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*SettingsTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*SettingsTest'`
 Expected: FAIL — `clampFrameskip` not defined.
 
 - [ ] **Step 7: Implement the `Settings` additions**
@@ -332,21 +332,21 @@ Add these methods (place `frameskip`/`setFrameskip` after `setFastForwardSpeed`,
 
 - [ ] **Step 8: Run the full unit-test suite to verify green**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest`
+Run: `android/gradlew -p android :app:testDebugUnitTest`
 Expected: PASS — all prior tests plus the new `KeyBindings` and `Settings` tests.
 
 - [ ] **Step 9: Lint**
 
-Run: `mgba-android/gradlew -p mgba-android lintDebug`
+Run: `android/gradlew -p android lintDebug`
 Expected: 0 errors.
 
 - [ ] **Step 10: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/KeyBindings.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/KeyBindingsTest.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/KeyBindings.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/KeyBindingsTest.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java
 git commit -m "feat(app): key bindings map and frameskip/gamepad settings
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -357,11 +357,11 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: Frameskip end-to-end
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- Modify: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java`
-- Modify: `mgba-android/app/src/main/res/values/strings.xml`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- Modify: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java`
+- Modify: `android/app/src/main/res/values/strings.xml`
 
 **Interfaces:**
 - Consumes: `Settings.frameskip()` (Task 1).
@@ -401,7 +401,7 @@ Ensure the JUnit imports for `assertTrue`/`assertFalse` are present (add `import
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*EmulationRunnerTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*EmulationRunnerTest'`
 Expected: FAIL — `shouldRenderFrame` not defined.
 
 - [ ] **Step 3: Add `shouldRenderFrame` + the `frameskip` field/arg + loop gating**
@@ -495,17 +495,17 @@ Add to `res/values/strings.xml` (after `settings_ff_speed`):
 
 - [ ] **Step 6: Run unit tests + lint + build the APK**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
 Expected: tests PASS (incl. the 3 new frameskip tests), lint 0 errors, APK assembles. The whole app compiles (the `EmulationRunner` ctor change and its call site are both updated here).
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java \
-        mgba-android/app/src/main/res/values/strings.xml
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java \
+        android/app/src/main/res/values/strings.xml
 git commit -m "feat(app): frameskip control in the emulation loop
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -516,11 +516,11 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: Gamepad bind screen (reachable, edits persist)
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadDefaults.java`
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadSettingsActivity.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java`
-- Modify: `mgba-android/app/src/main/res/values/strings.xml`
-- Modify: `mgba-android/app/src/main/AndroidManifest.xml`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadDefaults.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadSettingsActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java`
+- Modify: `android/app/src/main/res/values/strings.xml`
+- Modify: `android/app/src/main/AndroidManifest.xml`
 
 **Interfaces:**
 - Consumes: `KeyBindings`, `Settings.gamepadBindings/setGamepadBindings` (Task 1).
@@ -754,17 +754,17 @@ In `AndroidManifest.xml`, alongside the other non-exported activities:
 
 - [ ] **Step 6: Unit tests + lint + build**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
 Expected: tests PASS (unchanged set still green), lint 0 errors, APK assembles.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadDefaults.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadSettingsActivity.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java \
-        mgba-android/app/src/main/res/values/strings.xml \
-        mgba-android/app/src/main/AndroidManifest.xml
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadDefaults.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/GamepadSettingsActivity.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java \
+        android/app/src/main/res/values/strings.xml \
+        android/app/src/main/AndroidManifest.xml
 git commit -m "feat(app): press-to-bind gamepad settings screen
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -775,7 +775,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: Apply remapping at runtime
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
 
 **Interfaces:**
 - Consumes: `KeyBindings`, `GamepadDefaults.map()`, `Settings.gamepadBindings` (Tasks 1, 3).
@@ -814,13 +814,13 @@ Delete the now-unused `private static int mapKey(int keyCode)` method and, if it
 
 - [ ] **Step 3: Unit tests + lint + build**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
 Expected: tests PASS, lint 0 errors (no "unused method" warning for `mapKey` since it's deleted), APK assembles.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
 git commit -m "feat(app): drive gameplay from the remappable key bindings
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -843,8 +843,8 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 /usr/lib/android-sdk/emulator/emulator -avd game-emulator-mvp -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
 adb -s emulator-5554 wait-for-device
 # wait until: adb -s emulator-5554 shell getprop sys.boot_completed == 1
-adb -s emulator-5554 install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
-adb -s emulator-5554 push mgba-android/core/src/androidTest/assets/hello.gba /sdcard/Download/hello.gba
+adb -s emulator-5554 install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
+adb -s emulator-5554 push android/core/src/androidTest/assets/hello.gba /sdcard/Download/hello.gba
 ```
 Import the ROM through the library's Import ROM → SAF picker (as in Phase 3/4a) and launch it.
 

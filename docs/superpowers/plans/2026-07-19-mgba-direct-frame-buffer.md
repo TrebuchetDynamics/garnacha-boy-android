@@ -25,14 +25,14 @@
 
 ## File map
 
-- `mgba-android/core/src/main/cpp/mgba_session.h`: pure-C direct-frame API.
-- `mgba-android/core/src/main/cpp/mgba_session.c`: contiguous stride, direct frame execution, buffer access, and retained legacy conversion.
-- `mgba-android/smoke/mgba_session_test.c`: host equivalence, dimensions, validation, and sanitizer coverage.
-- `mgba-android/core/src/main/cpp/mgba_android.c`: direct-buffer and direct-frame JNI entry points.
-- `mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`: one cached read-only direct buffer and additive Java API.
-- `mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`: GBA/GB/GBC raw-buffer-to-bitmap pixel equivalence.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`: select direct or legacy path once per loaded session.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`: opaque bitmap creation and direct-buffer publication.
+- `android/core/src/main/cpp/mgba_session.h`: pure-C direct-frame API.
+- `android/core/src/main/cpp/mgba_session.c`: contiguous stride, direct frame execution, buffer access, and retained legacy conversion.
+- `android/smoke/mgba_session_test.c`: host equivalence, dimensions, validation, and sanitizer coverage.
+- `android/core/src/main/cpp/mgba_android.c`: direct-buffer and direct-frame JNI entry points.
+- `android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`: one cached read-only direct buffer and additive Java API.
+- `android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`: GBA/GB/GBC raw-buffer-to-bitmap pixel equivalence.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`: select direct or legacy path once per loaded session.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`: opaque bitmap creation and direct-buffer publication.
 - `build/perf/`: ignored backups, candidate measurements, reports, and acceptance evidence.
 
 ---
@@ -40,9 +40,9 @@
 ### Task 1: Add the pure-C direct frame path
 
 **Files:**
-- Modify: `mgba-android/core/src/main/cpp/mgba_session.h`
-- Modify: `mgba-android/core/src/main/cpp/mgba_session.c`
-- Test: `mgba-android/smoke/mgba_session_test.c`
+- Modify: `android/core/src/main/cpp/mgba_session.h`
+- Modify: `android/core/src/main/cpp/mgba_session.c`
+- Test: `android/smoke/mgba_session_test.c`
 
 **Interfaces:**
 - Consumes: existing `MgbaSession`, ROM loading, audio extraction, and `mgba_session_run_frame` behavior.
@@ -54,14 +54,14 @@
 set -euo pipefail
 mkdir -p build/perf/direct-buffer-prechange
 FILES=(
-  mgba-android/core/src/main/cpp/mgba_session.h
-  mgba-android/core/src/main/cpp/mgba_session.c
-  mgba-android/smoke/mgba_session_test.c
-  mgba-android/core/src/main/cpp/mgba_android.c
-  mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java
-  mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+  android/core/src/main/cpp/mgba_session.h
+  android/core/src/main/cpp/mgba_session.c
+  android/smoke/mgba_session_test.c
+  android/core/src/main/cpp/mgba_android.c
+  android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java
+  android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 )
 tar -czf build/perf/direct-buffer-prechange/files.tar.gz "${FILES[@]}"
 find vendor/mgba src/main.c -type f -print0 \
@@ -76,7 +76,7 @@ Expected: the archive and hash exist under ignored `build/perf/`; no worktree fi
 
 - [ ] **Step 2: Write the failing host test**
 
-Add this helper and test to `mgba-android/smoke/mgba_session_test.c`:
+Add this helper and test to `android/smoke/mgba_session_test.c`:
 
 ```c
 static uint32_t native_to_argb(uint32_t native) {
@@ -148,7 +148,7 @@ Call it from `main` after `test_frame_validation_and_output`:
 
 ```sh
 rm -rf build/mgba-direct-red
-cmake -S mgba-android/smoke -B build/mgba-direct-red -G Ninja \
+cmake -S android/smoke -B build/mgba-direct-red -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug -DGARNACHA_SANITIZERS=ON
 cmake --build build/mgba-direct-red
 ```
@@ -283,9 +283,9 @@ Expected: both CTests pass with no sanitizer or strict-warning failure.
 With explicit shipping approval only:
 
 ```sh
-git add mgba-android/core/src/main/cpp/mgba_session.h \
-  mgba-android/core/src/main/cpp/mgba_session.c \
-  mgba-android/smoke/mgba_session_test.c
+git add android/core/src/main/cpp/mgba_session.h \
+  android/core/src/main/cpp/mgba_session.c \
+  android/smoke/mgba_session_test.c
 git commit -m "feat(core): expose contiguous direct frame buffer"
 ```
 
@@ -296,9 +296,9 @@ Otherwise leave these files unstaged and continue with the validated worktree.
 ### Task 2: Expose the direct buffer through JNI and Java
 
 **Files:**
-- Modify: `mgba-android/core/src/main/cpp/mgba_android.c`
-- Modify: `mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`
-- Test: `mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`
+- Modify: `android/core/src/main/cpp/mgba_android.c`
+- Modify: `android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`
+- Test: `android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`
 
 **Interfaces:**
 - Consumes: Task 1's `mgba_session_video_buffer` and `mgba_session_run_frame_direct`.
@@ -364,7 +364,7 @@ Add this test and helper before `readAsset`:
 - [ ] **Step 2: Run instrumentation compilation to verify it fails**
 
 ```sh
-mgba-android/gradlew -p mgba-android :core:compileDebugAndroidTestJavaWithJavac
+android/gradlew -p android :core:compileDebugAndroidTestJavaWithJavac
 ```
 
 Expected: compilation fails because `directFrameBuffer` and `runFrameDirect` are undefined.
@@ -481,9 +481,9 @@ Add native declarations beside `nativeRunFrame`:
 - [ ] **Step 5: Run core compilation and connected instrumentation**
 
 ```sh
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :core:assembleDebugAndroidTest :core:assembleDebug
-ANDROID_SERIAL=YOUR_DEVICE_SERIAL mgba-android/gradlew -p mgba-android \
+ANDROID_SERIAL=YOUR_DEVICE_SERIAL android/gradlew -p android \
   :core:connectedDebugAndroidTest
 ```
 
@@ -505,9 +505,9 @@ Expected: both CTests still pass under ASan/UBSan.
 With explicit shipping approval only:
 
 ```sh
-git add mgba-android/core/src/main/cpp/mgba_android.c \
-  mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
-  mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
+git add android/core/src/main/cpp/mgba_android.c \
+  android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
+  android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
 git commit -m "feat(android): expose direct mGBA frame buffer"
 ```
 
@@ -518,8 +518,8 @@ Otherwise leave these files unstaged.
 ### Task 3: Use the direct path in the Android application
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
 
 **Interfaces:**
 - Consumes: Task 2's cached `ByteBuffer`, direct frame method, and nullable startup fallback signal.
@@ -622,7 +622,7 @@ Keep the existing timing boundaries around these calls so baseline and candidate
 ```sh
 python3 - <<'PY'
 from pathlib import Path
-s = Path('mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java').read_text()
+s = Path('android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java').read_text()
 block = s[s.index('while (running)'):s.index('if (autoResume)')]
 normal = block.replace('throw new IllegalStateException("mGBA failed to run a frame");', '')
 assert 'new ' not in normal
@@ -639,7 +639,7 @@ Expected: the confirmation line prints.
 - [ ] **Step 4: Run app unit tests and build the benchmark APK**
 
 ```sh
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :app:testDebugUnitTest :app:assembleBenchmark
 ```
 
@@ -648,7 +648,7 @@ Expected: all app unit tests pass and `app-benchmark.apk` builds.
 - [ ] **Step 5: Run connected core pixel-equivalence tests again**
 
 ```sh
-ANDROID_SERIAL=YOUR_DEVICE_SERIAL mgba-android/gradlew -p mgba-android \
+ANDROID_SERIAL=YOUR_DEVICE_SERIAL android/gradlew -p android \
   :core:connectedDebugAndroidTest
 ```
 
@@ -660,8 +660,8 @@ With explicit shipping approval only:
 
 ```sh
 git add \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 git commit -m "perf(android): publish mGBA frames from direct buffer"
 ```
 
@@ -686,14 +686,14 @@ Otherwise leave these files unstaged.
 
 ```sh
 set -euo pipefail
-bash -n mgba-android/tools/measure-session.sh
-mgba-android/gradlew -p mgba-android clean lintDebug \
+bash -n android/tools/measure-session.sh
+android/gradlew -p android clean lintDebug \
   :app:testDebugUnitTest :app:assembleBenchmark \
   :core:assembleBenchmark :core:assembleDebugAndroidTest
-ANDROID_SERIAL=YOUR_DEVICE_SERIAL mgba-android/gradlew -p mgba-android \
+ANDROID_SERIAL=YOUR_DEVICE_SERIAL android/gradlew -p android \
   :core:connectedDebugAndroidTest
 rm -rf build/mgba-direct-final
-cmake -S mgba-android/smoke -B build/mgba-direct-final -G Ninja \
+cmake -S android/smoke -B build/mgba-direct-final -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug -DGARNACHA_SANITIZERS=ON
 cmake --build build/mgba-direct-final
 ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
@@ -720,7 +720,7 @@ Expected: `cmp` exits zero.
 
 ```sh
 adb -s YOUR_DEVICE_SERIAL install -r \
-  mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+  android/app/build/outputs/apk/benchmark/app-benchmark.apk
 adb -s YOUR_DEVICE_SERIAL shell pm path com.trebuchetdynamics.garnacha
 ```
 
@@ -733,25 +733,25 @@ For each run, start representative `minish` gameplay, warm up one minute, then e
 ```sh
 export ANDROID_SERIAL=YOUR_DEVICE_SERIAL
 export OUT_DIR=build/perf
-mgba-android/tools/measure-session.sh profile-start
+android/tools/measure-session.sh profile-start
 # Keep representative gameplay running for at least 600 seconds.
-mgba-android/tools/measure-session.sh profile-collect candidate-1
+android/tools/measure-session.sh profile-collect candidate-1
 ```
 
 ```sh
 export ANDROID_SERIAL=YOUR_DEVICE_SERIAL
 export OUT_DIR=build/perf
-mgba-android/tools/measure-session.sh profile-start
+android/tools/measure-session.sh profile-start
 # Keep representative gameplay running for at least 600 seconds.
-mgba-android/tools/measure-session.sh profile-collect candidate-2
+android/tools/measure-session.sh profile-collect candidate-2
 ```
 
 ```sh
 export ANDROID_SERIAL=YOUR_DEVICE_SERIAL
 export OUT_DIR=build/perf
-mgba-android/tools/measure-session.sh profile-start
+android/tools/measure-session.sh profile-start
 # Keep representative gameplay running for at least 600 seconds.
-mgba-android/tools/measure-session.sh profile-collect candidate-3
+android/tools/measure-session.sh profile-collect candidate-3
 ```
 
 Expected: each run directory contains complete `MgbaPerf`, `gfxinfo`, `meminfo`, device, and temperature evidence; no command accesses ROM content.
@@ -759,7 +759,7 @@ Expected: each run directory contains complete `MgbaPerf`, `gfxinfo`, `meminfo`,
 - [ ] **Step 5: Generate the candidate summary and verify run comparability**
 
 ```sh
-mgba-android/tools/measure-session.sh profile-summary \
+android/tools/measure-session.sh profile-summary \
   build/perf/profile-candidate-1 \
   build/perf/profile-candidate-2 \
   build/perf/profile-candidate-3 \
@@ -846,7 +846,7 @@ Expected: candidate 50th, 90th, 95th, and 99th percentile maxima do not exceed b
 ```sh
 set -euo pipefail
 mapfile -t LIB_DIRS < <(find \
-  mgba-android/core/build/intermediates/cxx/RelWithDebInfo \
+  android/core/build/intermediates/cxx/RelWithDebInfo \
   -type d -path '*/obj/arm64-v8a' | sort)
 [ "${#LIB_DIRS[@]}" -eq 1 ]
 rm -rf binary_cache build_cache
@@ -927,14 +927,14 @@ Only after an accepted result and explicit shipping approval:
 
 ```sh
 git add \
-  mgba-android/core/src/main/cpp/mgba_session.h \
-  mgba-android/core/src/main/cpp/mgba_session.c \
-  mgba-android/smoke/mgba_session_test.c \
-  mgba-android/core/src/main/cpp/mgba_android.c \
-  mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
-  mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+  android/core/src/main/cpp/mgba_session.h \
+  android/core/src/main/cpp/mgba_session.c \
+  android/smoke/mgba_session_test.c \
+  android/core/src/main/cpp/mgba_android.c \
+  android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
+  android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java \
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 git commit -m "perf(android): use direct mGBA frame buffer"
 ```
 

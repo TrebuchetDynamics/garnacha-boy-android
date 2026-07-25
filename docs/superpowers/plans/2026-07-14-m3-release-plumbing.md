@@ -4,7 +4,7 @@
 
 **Goal:** Turn the debug-only test app into a signed, branded, legally-compliant product that a stranger can download from GitHub Releases and play — tagged `v0.1.0`.
 
-**Architecture:** The app (`mgba-android/app`, applicationId `com.trebuchetdynamics.mgba`) currently ships as a debug/benchmark build signed with Android's debug key, labelled "mGBA Custom", with a placeholder vector icon and no licence notices. M3 adds: product identity (name/icon/strings), an in-app notices screen carrying mGBA's MPL-2.0 obligations, a release signing config that reads credentials from the environment and never from git, and a CI job that builds, signs, and attaches an APK to a GitHub Release on tag push.
+**Architecture:** The app (`android/app`, applicationId `com.trebuchetdynamics.mgba`) currently ships as a debug/benchmark build signed with Android's debug key, labelled "mGBA Custom", with a placeholder vector icon and no licence notices. M3 adds: product identity (name/icon/strings), an in-app notices screen carrying mGBA's MPL-2.0 obligations, a release signing config that reads credentials from the environment and never from git, and a CI job that builds, signs, and attaches an APK to a GitHub Release on tag push.
 
 **Tech Stack:** Android Gradle (JDK 17, SDK 35, NDK `22.1.7171670`, CMake `3.18.1`), `keytool`/`apksigner`/`aapt2` from build-tools 35.0.0, GitHub Actions, `gh` CLI.
 
@@ -33,16 +33,16 @@
 | File | Responsibility |
 |---|---|
 | `docs/adr/0002-product-name.md` (create) | Records the name and the accepted trademark risk |
-| `mgba-android/app/src/main/res/values/strings.xml` (create) | All user-visible strings; kills the hardcoded manifest label |
-| `mgba-android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml` (create) | Adaptive icon |
-| `mgba-android/app/src/main/res/drawable/ic_launcher_foreground.xml` (create) | Icon foreground |
-| `mgba-android/app/src/main/res/values/ic_launcher_background.xml` (create) | Icon background colour |
-| `mgba-android/app/src/main/assets/NOTICES.md` (create) | The notices text shown in-app and packaged in the APK |
+| `android/app/src/main/res/values/strings.xml` (create) | All user-visible strings; kills the hardcoded manifest label |
+| `android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml` (create) | Adaptive icon |
+| `android/app/src/main/res/drawable/ic_launcher_foreground.xml` (create) | Icon foreground |
+| `android/app/src/main/res/values/ic_launcher_background.xml` (create) | Icon background colour |
+| `android/app/src/main/assets/NOTICES.md` (create) | The notices text shown in-app and packaged in the APK |
 | `.../emulator/app/NoticesActivity.java` (create) | Renders the notices; reachable from the app |
 | `.../emulator/app/Notices.java` (create) | Pure loader/formatter — JVM-unit-testable |
 | `.../app/src/test/.../NoticesTest.java` (create) | Tests for the above |
-| `mgba-android/app/build.gradle` (modify) | `release` build type + signing config from env |
-| `mgba-android/app/src/main/AndroidManifest.xml` (modify) | Label from strings, adaptive icon, register NoticesActivity |
+| `android/app/build.gradle` (modify) | `release` build type + signing config from env |
+| `android/app/src/main/AndroidManifest.xml` (modify) | Label from strings, adaptive icon, register NoticesActivity |
 | `.gitignore` (modify) | Keystore patterns |
 | `CHANGELOG.md` (create) | Keep-a-Changelog format |
 | `.github/workflows/release.yml` (create) | Tag → build → sign → GitHub Release |
@@ -131,14 +131,14 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: Product identity — name, strings, adaptive icon
 
 **Files:**
-- Create: `mgba-android/app/src/main/res/values/strings.xml`
-- Create: `mgba-android/app/src/main/res/drawable/ic_launcher_foreground.xml`
-- Create: `mgba-android/app/src/main/res/values/ic_launcher_background.xml`
-- Create: `mgba-android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`
-- Create: `mgba-android/app/src/main/res/mipmap/ic_launcher.xml` (API 24–25 fallback)
-- Modify: `mgba-android/app/src/main/AndroidManifest.xml`
-- Modify: `mgba-android/app/build.gradle` (applicationId)
-- Delete: `mgba-android/app/src/main/res/drawable/ic_launcher.xml` (replaced)
+- Create: `android/app/src/main/res/values/strings.xml`
+- Create: `android/app/src/main/res/drawable/ic_launcher_foreground.xml`
+- Create: `android/app/src/main/res/values/ic_launcher_background.xml`
+- Create: `android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`
+- Create: `android/app/src/main/res/mipmap/ic_launcher.xml` (API 24–25 fallback)
+- Modify: `android/app/src/main/AndroidManifest.xml`
+- Modify: `android/app/build.gradle` (applicationId)
+- Delete: `android/app/src/main/res/drawable/ic_launcher.xml` (replaced)
 
 **Interfaces:**
 - Consumes: the name from Task 1.
@@ -236,12 +236,12 @@ In `AndroidManifest.xml`, change the `<application>` attributes:
 ```
 Then delete the old drawable:
 ```sh
-git rm mgba-android/app/src/main/res/drawable/ic_launcher.xml
+git rm android/app/src/main/res/drawable/ic_launcher.xml
 ```
 
 - [ ] **Step 7: Set the permanent applicationId**
 
-In `mgba-android/app/build.gradle`, change the one line:
+In `android/app/build.gradle`, change the one line:
 ```groovy
         applicationId 'com.trebuchetdynamics.garnacha'
 ```
@@ -252,9 +252,9 @@ is free to do now and only now.
 - [ ] **Step 8: Build and verify identity is really in the APK**
 
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark
+android/gradlew -p android lintDebug :app:assembleBenchmark
 $ANDROID_HOME/build-tools/35.0.0/aapt2 dump badging \
-  mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk | grep -E "application-label|application-icon|^package:"
+  android/app/build/outputs/apk/benchmark/app-benchmark.apk | grep -E "application-label|application-icon|^package:"
 ```
 Expected: `application-label:'Garnacha Boy'`, an `application-icon` entry, and
 `package: name='com.trebuchetdynamics.garnacha'`. Lint: 0 errors.
@@ -265,7 +265,7 @@ The old test app has a different applicationId, so this installs *alongside* it.
 Remove the old one to avoid confusing later steps:
 ```sh
 adb uninstall com.trebuchetdynamics.mgba || true
-adb install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+adb install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
 adb shell monkey -p com.trebuchetdynamics.garnacha -c android.intent.category.LAUNCHER 1
 ```
 Confirm the launcher shows "Garnacha Boy" with the new icon (not the old
@@ -274,7 +274,7 @@ placeholder, not a white square). Capture a screenshot for the receipt.
 - [ ] **Step 10: Commit**
 
 ```sh
-git add mgba-android/app/src/main/res mgba-android/app/src/main/AndroidManifest.xml mgba-android/app/build.gradle
+git add android/app/src/main/res android/app/src/main/AndroidManifest.xml android/app/build.gradle
 git commit -m "feat(app): brand the app as Garnacha Boy and fix the applicationId
 
 Replaces the 'mGBA Custom' placeholder label and flat vector icon, and sets the
@@ -295,11 +295,11 @@ their rights, and told where the source is. Packaging `LICENSE-mGBA` in the AAR
 surface it.
 
 **Files:**
-- Create: `mgba-android/app/src/main/assets/NOTICES.md`
+- Create: `android/app/src/main/assets/NOTICES.md`
 - Create: `.../emulator/app/Notices.java`
 - Create: `.../emulator/app/NoticesActivity.java`
-- Create: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/NoticesTest.java`
-- Modify: `mgba-android/app/src/main/AndroidManifest.xml`
+- Create: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/NoticesTest.java`
+- Modify: `android/app/src/main/AndroidManifest.xml`
 - Modify: `.../emulator/app/EmulatorView.java` (add a NOTICES tap target next to LOAD)
 
 **Interfaces:**
@@ -309,7 +309,7 @@ surface it.
 
 - [ ] **Step 1: Write the notices content**
 
-`mgba-android/app/src/main/assets/NOTICES.md`:
+`android/app/src/main/assets/NOTICES.md`:
 
 ```markdown
 # Garnacha Boy — open source notices
@@ -342,7 +342,7 @@ content you are legally entitled to use.
 
 - [ ] **Step 2: Write the failing test**
 
-`mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/NoticesTest.java`:
+`android/app/src/test/java/com/trebuchetdynamics/emulator/app/NoticesTest.java`:
 ```java
 package com.trebuchetdynamics.emulator.app;
 
@@ -379,7 +379,7 @@ public class NoticesTest {
 - [ ] **Step 3: Run it to verify it fails**
 
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*NoticesTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*NoticesTest'
 ```
 Expected: FAIL — `Notices` does not exist.
 
@@ -417,7 +417,7 @@ final class Notices {
 - [ ] **Step 5: Run it to verify it passes**
 
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*NoticesTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*NoticesTest'
 ```
 Expected: PASS (2 tests).
 
@@ -489,22 +489,22 @@ In `MainActivity`, pass a callback that starts the activity:
 - [ ] **Step 8: Build, test, and verify on device**
 
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
-adb install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+adb install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
 ```
 On the device: tap NOTICES; confirm the mGBA MPL-2.0 attribution and source URL
 render and scroll. Screenshot it — that screenshot is the compliance evidence.
 
 Also confirm the licence file is actually inside the APK:
 ```sh
-unzip -l mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk | grep -iE "NOTICES|LICENSE"
+unzip -l android/app/build/outputs/apk/benchmark/app-benchmark.apk | grep -iE "NOTICES|LICENSE"
 ```
 Expected: `assets/NOTICES.md` present, plus the existing `META-INF/LICENSE-mGBA`.
 
 - [ ] **Step 9: Commit**
 
 ```sh
-git add mgba-android/app/src/main mgba-android/app/src/test
+git add android/app/src/main android/app/src/test
 git commit -m "feat(app): show open-source notices in-app
 
 MPL-2.0 requires binary recipients be told of the licence and where to get the
@@ -521,7 +521,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: Release signing that never touches git
 
 **Files:**
-- Modify: `mgba-android/app/build.gradle`
+- Modify: `android/app/build.gradle`
 - Modify: `.gitignore`
 - Create: `RELEASING.md`
 
@@ -572,7 +572,7 @@ git check-ignore -v ~/.android-keys/garnacha-release.jks 2>/dev/null || echo "ou
 
 - [ ] **Step 3: Wire signing into build.gradle**
 
-In `mgba-android/app/build.gradle`, add above `buildTypes`:
+In `android/app/build.gradle`, add above `buildTypes`:
 ```groovy
     signingConfigs {
         release {
@@ -605,8 +605,8 @@ measurement and must not start depending on the release key.
 Without credentials (the contributor path):
 ```sh
 unset GARNACHA_KEYSTORE_PATH
-mgba-android/gradlew -p mgba-android :app:assembleRelease
-ls mgba-android/app/build/outputs/apk/release/
+android/gradlew -p android :app:assembleRelease
+ls android/app/build/outputs/apk/release/
 ```
 Expected: BUILD SUCCESSFUL, an `app-release-unsigned.apk` — not a failure.
 
@@ -614,9 +614,9 @@ With credentials (the release path):
 ```sh
 export GARNACHA_KEYSTORE_PATH=~/.android-keys/garnacha-release.jks
 export GARNACHA_KEYSTORE_PASSWORD='...' GARNACHA_KEY_ALIAS=garnacha GARNACHA_KEY_PASSWORD='...'
-mgba-android/gradlew -p mgba-android clean :app:assembleRelease
+android/gradlew -p android clean :app:assembleRelease
 $ANDROID_HOME/build-tools/35.0.0/apksigner verify --print-certs \
-  mgba-android/app/build/outputs/apk/release/app-release.apk
+  android/app/build/outputs/apk/release/app-release.apk
 ```
 Expected: `Verifies`, and a certificate whose DN is the one from Step 2. Record
 the **SHA-256 certificate digest** — publish it in `RELEASING.md` so users can
@@ -636,7 +636,7 @@ GitHub it means users must uninstall and reinstall).
 ```sh
 git status --short          # no .jks, no properties file
 git diff --cached | grep -iE "password|BEGIN (RSA|PRIVATE)" && echo "SECRET IN DIFF — STOP" || echo "clean"
-git add mgba-android/app/build.gradle RELEASING.md
+git add android/app/build.gradle RELEASING.md
 git commit -m "feat(release): sign release builds from env-supplied credentials
 
 The keystore and its passwords come from the environment (CI secrets locally),
@@ -652,7 +652,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 **Files:**
 - Create: `CHANGELOG.md`
-- Modify: `mgba-android/app/build.gradle`
+- Modify: `android/app/build.gradle`
 
 **Interfaces:**
 - Produces: `versionName` derived from the git tag when building in CI; a
@@ -660,7 +660,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 - [ ] **Step 1: Derive the version from the tag**
 
-In `mgba-android/app/build.gradle`, replace the hardcoded version lines:
+In `android/app/build.gradle`, replace the hardcoded version lines:
 ```groovy
         // A tag push (refs/tags/v0.1.0) sets GARNACHA_VERSION_NAME in CI.
         // Local builds fall back to a dev marker so they can never be mistaken
@@ -707,9 +707,9 @@ entitled to use.
 
 ```sh
 GARNACHA_VERSION_NAME=0.1.0 GARNACHA_VERSION_CODE=1 \
-  mgba-android/gradlew -p mgba-android :app:assembleBenchmark
+  android/gradlew -p android :app:assembleBenchmark
 $ANDROID_HOME/build-tools/35.0.0/aapt2 dump badging \
-  mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk | head -1
+  android/app/build/outputs/apk/benchmark/app-benchmark.apk | head -1
 ```
 Expected: `versionName='0.1.0'`. Then without the env var, expect
 `versionName='0.1.0-dev'` — a local build must be distinguishable from a release.
@@ -717,7 +717,7 @@ Expected: `versionName='0.1.0'`. Then without the env var, expect
 - [ ] **Step 4: Commit**
 
 ```sh
-git add CHANGELOG.md mgba-android/app/build.gradle
+git add CHANGELOG.md android/app/build.gradle
 git commit -m "feat(release): derive the version from the tag; add a changelog
 
 Local builds report 0.1.0-dev so they can never be mistaken for a release.
@@ -805,12 +805,12 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           GARNACHA_VERSION_NAME="$VERSION" \
           GARNACHA_VERSION_CODE="${GITHUB_RUN_NUMBER}" \
-          mgba-android/gradlew -p mgba-android \
+          android/gradlew -p android \
             lintDebug :app:testDebugUnitTest :app:assembleRelease
 
       - name: Verify the APK is signed with the expected key
         run: |
-          APK=mgba-android/app/build/outputs/apk/release/app-release.apk
+          APK=android/app/build/outputs/apk/release/app-release.apk
           test -f "$APK" || { echo "release APK is missing — was it signed?"; exit 1; }
           "$ANDROID_HOME"/build-tools/35.0.0/apksigner verify --print-certs "$APK"
           mv "$APK" "garnacha-boy-${GITHUB_REF_NAME}.apk"

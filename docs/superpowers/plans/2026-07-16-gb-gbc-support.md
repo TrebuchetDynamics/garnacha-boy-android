@@ -19,35 +19,35 @@
 - The private per-ROM filename stays `roms/<romId>.gba` for **all** systems (opaque suffix; content is detected at load) — preserves the existing romId↔path and file-scan contracts.
 - minSdk 24; 0 lint errors; commit trailer `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>`.
 - Build/test (from repo root):
-  - Unit tests: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest`
-  - Lint: `mgba-android/gradlew -p mgba-android lintDebug`
-  - Benchmark APK: `mgba-android/gradlew -p mgba-android :app:assembleBenchmark`
+  - Unit tests: `android/gradlew -p android :app:testDebugUnitTest`
+  - Lint: `android/gradlew -p android lintDebug`
+  - Benchmark APK: `android/gradlew -p android :app:assembleBenchmark`
   - Instrumented (needs a device/AVD): `:core:connectedBenchmarkAndroidTest` (or the project's existing instrumented task)
 
 ## File Structure
 
-- `mgba-android/core/CMakeLists.txt` — enable GB core.
-- `mgba-android/core/src/main/cpp/mgba_android.c` — platform-selected core, variable video dims, `canCreateGbCore`, dimension getters.
-- `mgba-android/core/src/main/java/.../mgba/MgbaSession.java` — platform constant + ctor, dimension accessors.
+- `android/core/CMakeLists.txt` — enable GB core.
+- `android/core/src/main/cpp/mgba_android.c` — platform-selected core, variable video dims, `canCreateGbCore`, dimension getters.
+- `android/core/src/main/java/.../mgba/MgbaSession.java` — platform constant + ctor, dimension accessors.
 - `.../mgba/MgbaCore.java` — `canCreateGbCore`.
 - `.../mgba/MgbaCoreInstrumentedTest.java` — GB core linked assertion.
 - `.../app/RomSystem.java` (new) + `RomSystemTest.java` (new).
 - `.../app/ControlLayout.java` (+ `ControlLayoutTest.java`).
 - `.../app/EmulationRunner.java`, `EmulatorView.java`.
 - `.../app/RomImporter.java`, `RomArchive.java`, `RomLibrary.java`, `LibraryActivity.java`.
-- Test assets: a public-domain GB and GBC homebrew ROM under `mgba-android/core/src/androidTest/assets/`.
+- Test assets: a public-domain GB and GBC homebrew ROM under `android/core/src/androidTest/assets/`.
 
-Main app dir: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/`
-Test dir: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/`
-Core dir: `mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/`
+Main app dir: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/`
+Test dir: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/`
+Core dir: `android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/`
 
 ---
 
 ### Task 1: Native — enable the GB core, select by platform, variable video dimensions
 
 **Files:**
-- Modify: `mgba-android/core/CMakeLists.txt`
-- Modify: `mgba-android/core/src/main/cpp/mgba_android.c`
+- Modify: `android/core/CMakeLists.txt`
+- Modify: `android/core/src/main/cpp/mgba_android.c`
 - Modify: `.../mgba/MgbaSession.java`, `.../mgba/MgbaCore.java`
 - Modify: `.../mgba/MgbaCoreInstrumentedTest.java`
 
@@ -57,7 +57,7 @@ Core dir: `mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/`
 
 - [ ] **Step 1: Enable the GB core in CMake**
 
-In `mgba-android/core/CMakeLists.txt`, change line 11 from:
+In `android/core/CMakeLists.txt`, change line 11 from:
 ```cmake
 set(M_CORE_GB OFF CACHE BOOL "Do not build the Game Boy core" FORCE)
 ```
@@ -68,7 +68,7 @@ set(M_CORE_GB ON CACHE BOOL "Build the Game Boy core" FORCE)
 
 - [ ] **Step 2: Native — session dimensions, platform-selected core, variable runFrame**
 
-In `mgba-android/core/src/main/cpp/mgba_android.c`:
+In `android/core/src/main/cpp/mgba_android.c`:
 
 Add two fields to `struct MgbaSession` (after `bool loaded;`):
 ```c
@@ -272,18 +272,18 @@ Leave the existing `canCreateGbaCore` and session/load tests unchanged — they 
 
 - [ ] **Step 6: Build the core + APK, run instrumented tests on a device/AVD**
 
-Run: `mgba-android/gradlew -p mgba-android :core:assembleBenchmark :app:assembleBenchmark`
+Run: `android/gradlew -p android :core:assembleBenchmark :app:assembleBenchmark`
 Expected: native build succeeds with the GB core compiled in; APK assembles.
 Then on a booted AVD run the core instrumented tests (the project's existing instrumented task). Expected: `canCreateGbaCore` and `canCreateGbCore` both pass; existing GBA session/load tests pass.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add mgba-android/core/CMakeLists.txt \
-        mgba-android/core/src/main/cpp/mgba_android.c \
-        mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
-        mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaCore.java \
-        mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
+git add android/core/CMakeLists.txt \
+        android/core/src/main/cpp/mgba_android.c \
+        android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
+        android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaCore.java \
+        android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
 git commit -m "feat(core): enable the Game Boy core with per-platform video dimensions
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -369,7 +369,7 @@ public class RomSystemTest {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*RomSystemTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*RomSystemTest'`
 Expected: FAIL — `RomSystem` does not exist.
 
 - [ ] **Step 3: Implement `RomSystem`**
@@ -436,14 +436,14 @@ enum RomSystem {
 
 - [ ] **Step 4: Run to green, then lint**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*RomSystemTest' lintDebug`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*RomSystemTest' lintDebug`
 Expected: PASS; lint 0 errors.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomSystem.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/RomSystemTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomSystem.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/RomSystemTest.java
 git commit -m "feat(app): content-based ROM system detection
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -514,7 +514,7 @@ Add to `ControlLayoutTest.java`:
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*ControlLayoutTest'`
+Run: `android/gradlew -p android :app:testDebugUnitTest --tests '*ControlLayoutTest'`
 Expected: FAIL — the 6-arg `of(...)` does not exist.
 
 - [ ] **Step 3: Add the parameterized builder + thread through `portrait`/`landscape`**
@@ -565,14 +565,14 @@ Wrap the two `controls.add(... KEY_L ...)` / `controls.add(... KEY_R ...)` block
 
 - [ ] **Step 4: Run to green + full suite + lint**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug`
 Expected: new tests pass; all pre-existing `ControlLayoutTest` cases still pass (GBA layout unchanged); lint 0 errors.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java
 git commit -m "feat(app): control layout adapts to source aspect and hides L/R for GB
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -675,14 +675,14 @@ with:
 
 - [ ] **Step 3: Build, unit tests, lint, APK**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
 Expected: tests pass, lint 0 errors, APK assembles. A GBA ROM still plays at 240×160 with L/R (unchanged); a Game Boy ROM would now load into the GB core at 160×144 with L/R hidden.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 git commit -m "feat(app): play GB/GBC ROMs with per-system dimensions and controls
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -744,16 +744,16 @@ In `LibraryActivity.java`, where each row renders the display name + relative ti
 
 - [ ] **Step 4: Build, unit tests, lint, APK**
 
-Run: `mgba-android/gradlew -p mgba-android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
+Run: `android/gradlew -p android :app:testDebugUnitTest lintDebug :app:assembleBenchmark`
 Expected: tests pass, lint 0 errors, APK assembles. (If `RomLibrary`/`RomImporter` have unit tests, update their `record(...)` calls to the new signature and keep them green.)
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomImporter.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomArchive.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomLibrary.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomImporter.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomArchive.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/RomLibrary.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java
 git commit -m "feat(app): import and badge GB/GBC ROMs in the library
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
@@ -765,7 +765,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 **Files:**
 - Create: `docs/validation/gb-gbc-support-<date>.md`
-- Add: a public-domain GB and GBC homebrew test ROM under `mgba-android/core/src/androidTest/assets/`.
+- Add: a public-domain GB and GBC homebrew test ROM under `android/core/src/androidTest/assets/`.
 
 **Interfaces:**
 - Consumes: everything above.
@@ -773,7 +773,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 - [ ] **Step 1: Source public-domain test ROMs**
 
-Obtain a small **public-domain / CC0 homebrew** Game Boy ROM and a Game Boy Color homebrew ROM (as with the existing MIT `hello.gba`). Place them under `mgba-android/core/src/androidTest/assets/` (e.g. `hello.gb`, `hello.gbc`). Record their source/license in the receipt. Do **not** use copyrighted commercial ROMs.
+Obtain a small **public-domain / CC0 homebrew** Game Boy ROM and a Game Boy Color homebrew ROM (as with the existing MIT `hello.gba`). Place them under `android/core/src/androidTest/assets/` (e.g. `hello.gb`, `hello.gbc`). Record their source/license in the receipt. Do **not** use copyrighted commercial ROMs.
 
 - [ ] **Step 2: Verify on a clean AVD**
 
@@ -798,7 +798,7 @@ Expected: 0 fatal/ANR.
 Create `docs/validation/gb-gbc-support-<date>.md` recording device (AVD), the test-ROM sources/licenses, each check pass/fail with what was seen (badges, dimensions, L/R hidden, colour for GBC, GBA unchanged), the 0-fatal/ANR result, and the screenshot. Then:
 ```bash
 git add docs/validation/gb-gbc-support-<date>.md docs/validation/gb-gbc-support.png \
-        mgba-android/core/src/androidTest/assets/hello.gb mgba-android/core/src/androidTest/assets/hello.gbc
+        android/core/src/androidTest/assets/hello.gb android/core/src/androidTest/assets/hello.gbc
 git commit -m "docs: record GB/GBC support device verification
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"

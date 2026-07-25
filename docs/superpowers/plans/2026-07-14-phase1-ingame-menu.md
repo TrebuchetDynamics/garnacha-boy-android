@@ -6,12 +6,12 @@
 
 **Architecture:** The emulated core is single-threaded and lives on the `mgba-emulation` thread inside `EmulationRunner`. The UI cannot call `MgbaSession` directly, so the menu enqueues commands (save/load/reset) that the emulation loop drains each iteration; results are posted back to the UI via a listener. Save-state bytes live in per-ROM slot files managed by a pure, JVM-tested `SaveStateStore`. Fast-forward is a volatile flag that shrinks the per-frame time budget and mutes audio. The menu itself is a programmatic translucent `View` overlaid on the existing `EmulatorView` inside a `FrameLayout`, opened by a new MENU handle chip added to the single-sourced `ControlLayout` geometry. Soft reset needs a new `MgbaSession.reset()` + one JNI method, since the core exposes save/load state but no reset.
 
-**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), JNI/C (mGBA 0.10.5), JUnit 4 (JVM unit tests), AndroidX instrumentation tests, Gradle via `mgba-android/gradlew`.
+**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), JNI/C (mGBA 0.10.5), JUnit 4 (JVM unit tests), AndroidX instrumentation tests, Gradle via `android/gradlew`.
 
 ## Global Constraints
 
 - mGBA stays an unmodified pinned submodule (`26b7884bc25a5933960f3cdcd98bac1ae14d42e2`, `0.10.5`); never edit files under `vendor/mgba`.
-- No game or BIOS content is committed; instrumentation uses only the MIT `gba-tests` ROMs already in `mgba-android/core/src/androidTest/assets/`.
+- No game or BIOS content is committed; instrumentation uses only the MIT `gba-tests` ROMs already in `android/core/src/androidTest/assets/`.
 - `SaveStateStore` and any pacing helper must have **no `android.*` imports** so they unit-test on the JVM (the established pattern for `ControlLayout`, `RomArchive`, `FrameStats`).
 - All on-screen control/chip geometry lives ONLY in `ControlLayout`; `EmulatorView` never recomputes a position. New chips add fields + an `isXHit` there, mirroring `isLoadHit`/`isNoticesHit`.
 - Save/load state and reset execute ONLY on the emulation thread, never on the UI thread (`MgbaSession` is `synchronized` and single-threaded).
@@ -23,7 +23,7 @@
 
 | File | Responsibility |
 |---|---|
-| `mgba-android/core/src/main/cpp/mgba_android.c` (modify) | `nativeReset` JNI — soft-reset the loaded core |
+| `android/core/src/main/cpp/mgba_android.c` (modify) | `nativeReset` JNI — soft-reset the loaded core |
 | `.../mgba/MgbaSession.java` (modify) | `reset()` + `nativeReset` declaration |
 | `.../mgba/MgbaCoreInstrumentedTest.java` (modify) | instrumentation test for reset |
 | `.../app/SaveStateStore.java` (create) | per-ROM save-state slot files; pure `java.io`, JVM-tested |
@@ -44,9 +44,9 @@ Package for all `.../app/` files: `com.trebuchetdynamics.emulator.app`. Package 
 ### Task 1: Soft reset in the core
 
 **Files:**
-- Modify: `mgba-android/core/src/main/cpp/mgba_android.c`
-- Modify: `mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`
-- Test: `mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`
+- Modify: `android/core/src/main/cpp/mgba_android.c`
+- Modify: `android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`
+- Test: `android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`
 
 **Interfaces:**
 - Produces: `MgbaSession.reset()` — soft-resets the loaded core (throws `IllegalStateException` if closed or no ROM loaded). Task 3 calls it from the emulation loop.
@@ -79,7 +79,7 @@ If `readAsset` is not the exact helper name in this file, use whatever helper th
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :core:compileDebugAndroidTestSources
+android/gradlew -p android :core:compileDebugAndroidTestSources
 ```
 Expected: FAIL — `cannot find symbol: method reset()`.
 
@@ -123,16 +123,16 @@ And add the native declaration with the other `private static native` lines (nea
 
 Run (a device/emulator must be connected; use its serial):
 ```sh
-ANDROID_SERIAL=<serial> mgba-android/gradlew -p mgba-android :core:connectedDebugAndroidTest
+ANDROID_SERIAL=<serial> android/gradlew -p android :core:connectedDebugAndroidTest
 ```
-Expected: `BUILD SUCCESSFUL`; the report under `mgba-android/core/build/reports/androidTests/connected/` shows `resetReturnsTheCoreToPowerOn` passing and 0 failures. If no device is available to the implementer, STOP and report DONE_WITH_CONCERNS — the controller will run this on the physical device.
+Expected: `BUILD SUCCESSFUL`; the report under `android/core/build/reports/androidTests/connected/` shows `resetReturnsTheCoreToPowerOn` passing and 0 failures. If no device is available to the implementer, STOP and report DONE_WITH_CONCERNS — the controller will run this on the physical device.
 
 - [ ] **Step 6: Commit**
 
 ```sh
-git add mgba-android/core/src/main/cpp/mgba_android.c \
-        mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
-        mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
+git add android/core/src/main/cpp/mgba_android.c \
+        android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java \
+        android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java
 git commit -m "feat(core): expose soft reset for the in-game menu
 
 MgbaSession.reset() soft-resets the loaded core (cartridge save persists);
@@ -146,8 +146,8 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: SaveStateStore — per-ROM slot files
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SaveStateStore.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/SaveStateStoreTest.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/SaveStateStore.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/SaveStateStoreTest.java`
 
 **Interfaces:**
 - Produces:
@@ -241,7 +241,7 @@ public class SaveStateStoreTest {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*SaveStateStoreTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*SaveStateStoreTest'
 ```
 Expected: FAIL — `SaveStateStore` does not exist.
 
@@ -329,15 +329,15 @@ final class SaveStateStore {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*SaveStateStoreTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*SaveStateStoreTest'
 ```
 Expected: PASS (6 tests).
 
 - [ ] **Step 5: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SaveStateStore.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/SaveStateStoreTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/SaveStateStore.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/SaveStateStoreTest.java
 git commit -m "feat(app): per-ROM save-state slot store
 
 Atomic per-slot files under a per-ROM directory; pure java.io, JVM-tested.
@@ -350,8 +350,8 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: EmulationRunner — commands, fast-forward, listener
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java`
 
 **Interfaces:**
 - Consumes: `MgbaSession.reset()` (Task 1); `SaveStateStore` (Task 2).
@@ -395,7 +395,7 @@ public class EmulationRunnerTest {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*EmulationRunnerTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*EmulationRunnerTest'
 ```
 Expected: FAIL — `frameBudgetNanos` does not exist.
 
@@ -558,7 +558,7 @@ Add the `applyCommands` helper method after `run()` (after line 116, before `cre
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*EmulationRunnerTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*EmulationRunnerTest'
 ```
 Expected: PASS (2 tests).
 
@@ -566,15 +566,15 @@ Expected: PASS (2 tests).
 
 The only caller of the `EmulationRunner` constructor is `MainActivity`, updated in Task 5. To keep this task independently compilable, this task builds only the classes it owns via the unit-test compile above; the full `:app:assembleBenchmark` is run at the end of Task 5. Run lint on the changed file's module now to catch obvious issues:
 ```sh
-mgba-android/gradlew -p mgba-android :app:compileDebugUnitTestJavaWithJavac
+android/gradlew -p android :app:compileDebugUnitTestJavaWithJavac
 ```
 Expected: BUILD SUCCESSFUL (the unit-test source set compiles `EmulationRunner` and the test).
 
 - [ ] **Step 7: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java
 git commit -m "feat(app): emulation-thread commands, fast-forward, save-state hooks
 
 Save/load/reset are enqueued from the UI and applied on the emulation thread
@@ -589,9 +589,9 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: MENU handle chip in the geometry
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
 
 **Interfaces:**
 - Consumes: existing `ControlLayout` header-band chip pattern (`loadLeft..loadBottom`, `noticesLeft..noticesBottom`, `isLoadHit`, `isNoticesHit`).
@@ -623,7 +623,7 @@ In `ControlLayoutTest.java`, add a test that the MENU chip does not overlap the 
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*ControlLayoutTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*ControlLayoutTest'
 ```
 Expected: FAIL — `menuLeft` (etc.) do not exist.
 
@@ -686,7 +686,7 @@ Add the hit-test after `isNoticesHit` (after line 298):
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*ControlLayoutTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*ControlLayoutTest'
 ```
 Expected: PASS (all ControlLayoutTest tests, including the new one).
 
@@ -709,16 +709,16 @@ In `onTouchEvent`, in the `ACTION_UP` branch where `isNoticesHit`/`isLoadHit` ar
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass. (Full APK assembly happens in Task 5 once `MainActivity` provides the new `requestMenu` argument.)
 
 - [ ] **Step 7: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 git commit -m "feat(app): add the MENU handle chip to the control geometry
 
 Single-sourced in ControlLayout next to LOAD/NOTICES, with a non-overlap test in
@@ -732,9 +732,9 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 5: The overlay view and MainActivity wiring
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
-- Modify: `mgba-android/app/src/main/res/values/strings.xml`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/res/values/strings.xml`
 
 **Interfaces:**
 - Consumes: `EmulationRunner.postSaveState/postLoadState/postReset/setFastForward/isFastForward` + `StateListener` (Task 3); `SaveStateStore` (Task 2); `EmulatorView` `requestMenu` (Task 4).
@@ -1007,16 +1007,16 @@ Add a back-button handler so the system Back closes the menu instead of leaving 
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass. The full app now compiles with the new constructor arguments.
 
 - [ ] **Step 5: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
-        mgba-android/app/src/main/res/values/strings.xml
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
+        android/app/src/main/res/values/strings.xml
 git commit -m "feat(app): in-game menu overlay (save/load slots, fast-forward, reset)
 
 A translucent menu over the running game: multi-slot save/load state, a
@@ -1041,7 +1041,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 With the physical arm64 device unlocked and connected:
 ```sh
-adb install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+adb install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
 adb shell am start -n com.trebuchetdynamics.garnacha/com.trebuchetdynamics.emulator.app.MainActivity
 ```
 Import a ROM and start play (a game with an in-game save is ideal for the load test). Then, tapping the MENU chip each time:

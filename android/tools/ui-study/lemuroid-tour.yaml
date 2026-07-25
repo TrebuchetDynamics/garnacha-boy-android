@@ -1,7 +1,7 @@
 # Maestro study flow: tour Lemuroid's UI to capture its UX conventions.
 # Requires the device to be physically unlocked first (adb cannot dismiss the
 # Samsung swipe keyguard). Run:
-#   ANDROID_SERIAL=<serial> maestro test mgba-android/tools/ui-study/lemuroid-tour.yaml
+#   ANDROID_SERIAL=<serial> maestro test android/tools/ui-study/lemuroid-tour.yaml
 # Screenshots land in ~/.maestro/tests/<timestamp>/ and are the study artifacts.
 appId: com.swordfish.lemuroid
 ---

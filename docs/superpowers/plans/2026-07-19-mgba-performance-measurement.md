@@ -23,12 +23,12 @@
 
 ## File Map
 
-- Modify `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java`: aggregate phase durations and format stable windows.
-- Modify `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`: deterministic phase and rejection coverage.
-- Modify `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`: capture existing frame phases with primitive timestamps.
-- Create `mgba-android/app/src/benchmark/AndroidManifest.xml`: benchmark-only shell profiling permission.
-- Modify `mgba-android/tools/measure-session.sh`: current package ID and connected profile collection/summary modes.
-- Modify `mgba-android/README.md`: profiling protocol and command reference.
+- Modify `android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java`: aggregate phase durations and format stable windows.
+- Modify `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`: deterministic phase and rejection coverage.
+- Modify `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`: capture existing frame phases with primitive timestamps.
+- Create `android/app/src/benchmark/AndroidManifest.xml`: benchmark-only shell profiling permission.
+- Modify `android/tools/measure-session.sh`: current package ID and connected profile collection/summary modes.
+- Modify `android/README.md`: profiling protocol and command reference.
 - Generate under ignored `build/perf/`: three run directories, baseline summary, `perf.data`, and simpleperf report.
 
 ---
@@ -36,8 +36,8 @@
 ### Task 1: Extend frame-window aggregation
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`
 
 **Interfaces:**
 - Produces: `boolean FrameStats.record(long totalNanos, long nativeNanos, long audioNanos, long publishNanos, long rewindNanos)`.
@@ -47,8 +47,8 @@
 
 ```sh
 mkdir -p build/perf
-find vendor/mgba mgba-android/core/src/main/cpp \
-  mgba-android/core/src/main/java src/main.c -type f -print0 \
+find vendor/mgba android/core/src/main/cpp \
+  android/core/src/main/java src/main.c -type f -print0 \
   | sort -z | xargs -0 sha256sum | sha256sum \
   > build/perf/measurement-excluded.sha256
 ```
@@ -144,7 +144,7 @@ public class FrameStatsTest {
 - [ ] **Step 3: Run the focused test and verify compilation fails**
 
 ```sh
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :app:testDebugUnitTest --tests '*FrameStatsTest'
 ```
 
@@ -247,8 +247,8 @@ Expected: all six `FrameStatsTest` tests pass.
 With explicit shipping approval only:
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java \
-  mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java \
+  android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java
 git commit -m "test(app): attribute emulator frame phases"
 ```
 
@@ -257,8 +257,8 @@ git commit -m "test(app): attribute emulator frame phases"
 ### Task 2: Instrument existing frame-loop phases
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`
 
 **Interfaces:**
 - Consumes: Task 1's five-duration `FrameStats.record` method.
@@ -317,7 +317,7 @@ Keep the existing `MgbaPerf` logging and pacing code immediately after this bloc
 - [ ] **Step 2: Compile and run all app unit tests**
 
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest
+android/gradlew -p android :app:testDebugUnitTest
 ```
 
 Expected: `BUILD SUCCESSFUL`; all app tests pass.
@@ -327,7 +327,7 @@ Expected: `BUILD SUCCESSFUL`; all app tests pass.
 ```sh
 python3 - <<'PY'
 from pathlib import Path
-s = Path('mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java').read_text()
+s = Path('android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java').read_text()
 block = s[s.index('long frameStart ='):s.index('if (now >= nextPerfLog')]
 normal_path = block.replace(
     'throw new IllegalStateException("mGBA failed to run a frame");', '')
@@ -345,7 +345,7 @@ Expected: the confirmation line prints and the command exits zero.
 With explicit shipping approval only:
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java
 git commit -m "feat(app): measure emulator frame phases"
 ```
 
@@ -354,8 +354,8 @@ git commit -m "feat(app): measure emulator frame phases"
 ### Task 3: Add benchmark-only profiling and connected collection
 
 **Files:**
-- Create: `mgba-android/app/src/benchmark/AndroidManifest.xml`
-- Modify: `mgba-android/tools/measure-session.sh`
+- Create: `android/app/src/benchmark/AndroidManifest.xml`
+- Modify: `android/tools/measure-session.sh`
 
 **Interfaces:**
 - Produces commands: `profile-start`, `profile-collect LABEL`, `profile-summary RUN1 RUN2 RUN3`.
@@ -364,7 +364,7 @@ git commit -m "feat(app): measure emulator frame phases"
 - [ ] **Step 1: Verify profile summary mode is absent**
 
 ```sh
-if mgba-android/tools/measure-session.sh profile-summary a b c 2>/dev/null; then
+if android/tools/measure-session.sh profile-summary a b c 2>/dev/null; then
   echo 'unexpected existing profile-summary mode' >&2
   exit 1
 fi
@@ -374,7 +374,7 @@ Expected: command exits nonzero with the current usage message.
 
 - [ ] **Step 2: Add the benchmark manifest overlay**
 
-Create `mgba-android/app/src/benchmark/AndroidManifest.xml`:
+Create `android/app/src/benchmark/AndroidManifest.xml`:
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -572,7 +572,7 @@ Replace the fallback usage with:
 - [ ] **Step 5: Run syntax and deterministic fixture checks**
 
 ```sh
-bash -n mgba-android/tools/measure-session.sh
+bash -n android/tools/measure-session.sh
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT
 for n in 1 2 3; do
@@ -590,7 +590,7 @@ EOF
 Janky frames: 2 (2.00%)
 EOF
 done
-mgba-android/tools/measure-session.sh profile-summary \
+android/tools/measure-session.sh profile-summary \
   "$TMP/run1" "$TMP/run2" "$TMP/run3" > "$TMP/actual"
 grep -qx 'runs=3' "$TMP/actual"
 grep -qx 'avg_us=1000' "$TMP/actual"
@@ -604,13 +604,13 @@ Expected: all commands exit zero.
 - [ ] **Step 6: Verify benchmark-only profileability**
 
 ```sh
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :app:processBenchmarkMainManifest :app:processReleaseMainManifest
 python3 - <<'PY'
 from pathlib import Path
-benchmark = list(Path('mgba-android/app/build/intermediates').glob(
+benchmark = list(Path('android/app/build/intermediates').glob(
     '**/benchmark/**/AndroidManifest.xml'))
-release = list(Path('mgba-android/app/build/intermediates').glob(
+release = list(Path('android/app/build/intermediates').glob(
     '**/release/**/AndroidManifest.xml'))
 assert any('android:profileable="true"' in p.read_text() or
            '<profileable android:shell="true"' in p.read_text() for p in benchmark)
@@ -626,8 +626,8 @@ Expected: confirmation prints. If AGP serializes the namespace differently, insp
 With explicit shipping approval only:
 
 ```sh
-git add mgba-android/app/src/benchmark/AndroidManifest.xml \
-  mgba-android/tools/measure-session.sh
+git add android/app/src/benchmark/AndroidManifest.xml \
+  android/tools/measure-session.sh
 git commit -m "feat(tools): collect device frame phase profiles"
 ```
 
@@ -636,7 +636,7 @@ git commit -m "feat(tools): collect device frame phase profiles"
 ### Task 4: Document and validate the measurement harness
 
 **Files:**
-- Modify: `mgba-android/README.md`
+- Modify: `android/README.md`
 
 - [ ] **Step 1: Add the connected profiling workflow**
 
@@ -652,16 +652,16 @@ on, and fixed brightness. After one minute of warm-up:
 ```sh
 export ANDROID_SERIAL=YOUR_DEVICE_SERIAL
 export OUT_DIR=build/perf
-mgba-android/tools/measure-session.sh profile-start
+android/tools/measure-session.sh profile-start
 # Play the same representative segment for at least 10 minutes.
-mgba-android/tools/measure-session.sh profile-collect baseline-1
+android/tools/measure-session.sh profile-collect baseline-1
 ```
 
 Repeat as `baseline-2` and `baseline-3`, cooling the device until starting
 battery temperatures are within 2°C, then summarize:
 
 ```sh
-mgba-android/tools/measure-session.sh profile-summary \
+android/tools/measure-session.sh profile-summary \
   build/perf/profile-baseline-1 \
   build/perf/profile-baseline-2 \
   build/perf/profile-baseline-3 | tee build/perf/baseline-summary.txt
@@ -675,13 +675,13 @@ or app-private data.
 - [ ] **Step 2: Run all automated gates**
 
 ```sh
-bash -n mgba-android/tools/measure-session.sh
-mgba-android/gradlew -p mgba-android clean lintDebug \
+bash -n android/tools/measure-session.sh
+android/gradlew -p android clean lintDebug \
   :app:testDebugUnitTest :app:assembleBenchmark \
   :core:assembleBenchmark :core:assembleDebugAndroidTest
-ANDROID_SERIAL=YOUR_DEVICE_SERIAL mgba-android/gradlew -p mgba-android \
+ANDROID_SERIAL=YOUR_DEVICE_SERIAL android/gradlew -p android \
   :core:connectedDebugAndroidTest
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja \
+cmake -S android/smoke -B build/mgba-smoke -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug -DGARNACHA_SANITIZERS=ON
 cmake --build build/mgba-smoke
 ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
@@ -695,8 +695,8 @@ Expected: Java tests, lint, builds, 8 Android instrumentation tests, and 2 host 
 - [ ] **Step 3: Verify excluded scopes**
 
 ```sh
-find vendor/mgba mgba-android/core/src/main/cpp \
-  mgba-android/core/src/main/java src/main.c -type f -print0 \
+find vendor/mgba android/core/src/main/cpp \
+  android/core/src/main/java src/main.c -type f -print0 \
   | sort -z | xargs -0 sha256sum | sha256sum \
   > build/perf/measurement-excluded-current.sha256
 cmp build/perf/measurement-excluded.sha256 \
@@ -710,7 +710,7 @@ Expected: `cmp` exits zero, proving this slice did not alter excluded files desp
 With explicit shipping approval only:
 
 ```sh
-git add mgba-android/README.md
+git add android/README.md
 git commit -m "docs: describe connected performance baselines"
 ```
 
@@ -724,9 +724,9 @@ git commit -m "docs: describe connected performance baselines"
 - [ ] **Step 1: Build and install the benchmark APK**
 
 ```sh
-mgba-android/gradlew -p mgba-android :app:assembleBenchmark
+android/gradlew -p android :app:assembleBenchmark
 adb -s YOUR_DEVICE_SERIAL install -r \
-  mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+  android/app/build/outputs/apk/benchmark/app-benchmark.apk
 ```
 
 Expected: Gradle succeeds and adb prints `Success`.
@@ -743,9 +743,9 @@ Repeat this sequence with `N=1`, then `N=2`, then `N=3`, warming up before each 
 N=1
 export ANDROID_SERIAL=YOUR_DEVICE_SERIAL
 export OUT_DIR=build/perf
-mgba-android/tools/measure-session.sh profile-start
+android/tools/measure-session.sh profile-start
 # User plays the same segment for at least 600 seconds.
-mgba-android/tools/measure-session.sh profile-collect "baseline-$N"
+android/tools/measure-session.sh profile-collect "baseline-$N"
 ```
 
 Set `N` to the current run number. Before the next run, compare `start_battery_temp` in each `device.env`; all starts must be within 20 tenths of a degree Celsius.
@@ -755,7 +755,7 @@ Expected: `build/perf/profile-baseline-1`, `-2`, and `-3` each contain at least 
 - [ ] **Step 4: Produce the baseline summary**
 
 ```sh
-mgba-android/tools/measure-session.sh profile-summary \
+android/tools/measure-session.sh profile-summary \
   build/perf/profile-baseline-1 \
   build/perf/profile-baseline-2 \
   build/perf/profile-baseline-3 | tee build/perf/baseline-summary.txt
@@ -770,7 +770,7 @@ While the same benchmark gameplay is running:
 ```sh
 mkdir -p build/perf
 mapfile -t LIB_DIRS < <(find \
-  mgba-android/core/build/intermediates/cxx/RelWithDebInfo \
+  android/core/build/intermediates/cxx/RelWithDebInfo \
   -type d -path '*/obj/arm64-v8a' | sort)
 [ "${#LIB_DIRS[@]}" -eq 1 ] || {
   echo "Expected one optimized arm64 native directory, found ${#LIB_DIRS[@]}" >&2

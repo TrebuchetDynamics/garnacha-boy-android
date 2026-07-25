@@ -30,21 +30,21 @@ jobs:
 
       - name: Test mGBA core lifecycle on host
         run: |
-          cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake -S android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build/mgba-smoke
           ctest --test-dir build/mgba-smoke --output-on-failure
 
       - name: Build mGBA app and core
-        run: mgba-android/gradlew -p mgba-android lintDebug :app:testDebugUnitTest :app:assembleBenchmark :core:assembleBenchmark
+        run: android/gradlew -p android lintDebug :app:testDebugUnitTest :app:assembleBenchmark :core:assembleBenchmark
 
       - name: Upload optimized APK
         uses: actions/upload-artifact@v4
         with:
           name: garnacha-boy-android-benchmark
-          path: mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+          path: android/app/build/outputs/apk/benchmark/app-benchmark.apk
 
       - name: Upload optimized mGBA core AAR
         uses: actions/upload-artifact@v4
         with:
           name: garnacha-boy-android-core-benchmark
-          path: mgba-android/core/build/outputs/aar/core-benchmark.aar
+          path: android/core/build/outputs/aar/core-benchmark.aar

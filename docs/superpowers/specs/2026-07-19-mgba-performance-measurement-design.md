@@ -99,7 +99,7 @@ Add a benchmark-only manifest overlay with `<profileable android:shell="true"/>`
 
 ## Measurement script
 
-Update `mgba-android/tools/measure-session.sh` without replacing its sustained battery workflow:
+Update `android/tools/measure-session.sh` without replacing its sustained battery workflow:
 
 - change the package ID to `com.trebuchetdynamics.garnacha`;
 - add connected `profile-start`, `profile-collect`, and `profile-summary` modes;
@@ -167,7 +167,7 @@ Generated reports contain performance counters and device metadata only. They ex
 
 - Extend `FrameStatsTest` for phase averages, reset behavior, zero-occurrence phases, rewind maximum, late frames, and cumulative underrun deltas.
 - Add deterministic script fixture checks for valid three-run medians and rejection of missing/malformed windows.
-- Run `bash -n mgba-android/tools/measure-session.sh`.
+- Run `bash -n android/tools/measure-session.sh`.
 - Run Android Java unit tests, lint, benchmark APK/AAR builds, and existing core instrumentation.
 - Re-run host ASan/UBSan session tests to ensure the performance measurement slice does not disturb native hardening.
 - Verify the benchmark manifest alone is shell-profileable and release manifests remain unchanged.
@@ -181,12 +181,12 @@ Generated reports contain performance counters and device metadata only. They ex
 
 ## Expected files for slice 1
 
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java`
-- `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`
-- `mgba-android/app/src/benchmark/AndroidManifest.xml`
-- `mgba-android/tools/measure-session.sh`
-- `mgba-android/README.md`
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/FrameStats.java`
+- `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FrameStatsTest.java`
+- `android/app/src/benchmark/AndroidManifest.xml`
+- `android/tools/measure-session.sh`
+- `android/README.md`
 
 No core C/JNI file is expected to change in the measurement slice.
 

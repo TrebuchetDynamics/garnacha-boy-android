@@ -6,7 +6,7 @@
 
 **Architecture:** All new decision logic (fade alpha over time, integer-scaled draw rect, new-press detection) lives in a pure, android-free `FeelMath` class that unit-tests on the JVM (the codebase pattern used by `ControlLayout`, `SaveStateStore`, `FrameStats`). `EmulatorView` consumes those helpers in its existing Canvas `onDraw`/`onTouchEvent` loop: it draws the game bitmap with nearest-neighbor filtering into an integer-scaled, letterboxed rect; it tracks a last-input timestamp and applies a time-based alpha to the controls and chips while a game is running; and it fires a light haptic when a touch introduces a new key press. No new threads, no new geometry — control positions stay single-sourced in `ControlLayout`.
 
-**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), Canvas 2D drawing, `View.performHapticFeedback`, JUnit 4 (JVM unit tests), Gradle via `mgba-android/gradlew`.
+**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), Canvas 2D drawing, `View.performHapticFeedback`, JUnit 4 (JVM unit tests), Gradle via `android/gradlew`.
 
 ## Global Constraints
 
@@ -39,8 +39,8 @@ Package for all files: `com.trebuchetdynamics.emulator.app`.
 ### Task 1: FeelMath — the pure decision helpers
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java`
 
 **Interfaces:**
 - Produces:
@@ -126,7 +126,7 @@ public class FeelMathTest {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*FeelMathTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*FeelMathTest'
 ```
 Expected: FAIL — `FeelMath` does not exist.
 
@@ -208,15 +208,15 @@ final class FeelMath {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*FeelMathTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*FeelMathTest'
 ```
 Expected: PASS (7 tests).
 
 - [ ] **Step 5: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java
 git commit -m "feat(app): pure feel math — integer scale, idle-fade alpha, new-press
 
 Android-free, JVM-tested helpers the play view will consume for crisp scaling,
@@ -230,7 +230,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: Crisp integer-scaled, nearest-neighbor game rendering
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
 
 **Interfaces:**
 - Consumes: `FeelMath.integerScale` / `FeelMath.Box` (Task 1).
@@ -290,14 +290,14 @@ Add a reusable `RectF` field next to `gameRect` (around line 19):
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass (37 from before + 7 new FeelMath = 44).
 
 - [ ] **Step 4: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 git commit -m "feat(app): crisp integer-scaled, nearest-neighbor game rendering
 
 The frame is now drawn with filterBitmap disabled at an exact integer multiple
@@ -311,7 +311,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: Fade-when-idle controls and chips
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
 
 **Interfaces:**
 - Consumes: `FeelMath.controlAlpha` (Task 1).
@@ -371,14 +371,14 @@ Because `setColor` resets alpha to the color's own alpha, `setAlpha` must be cal
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all tests pass. The controller installs and confirms on-device (Task 5) that controls fade after ~2 s of no touch and snap back on touch while a game runs, and stay solid on the home screen.
 
 - [ ] **Step 5: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 git commit -m "feat(app): fade on-screen controls when idle during play
 
 Controls and chips fade to ~24% after 1.5s of no input while a game runs and
@@ -394,7 +394,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: Haptic feedback on presses
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
 
 **Interfaces:**
 - Consumes: `FeelMath.introducesNewPress` (Task 1).
@@ -427,14 +427,14 @@ And in the `ACTION_UP` branch, reset the tracker so the next touch's first press
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all tests pass.
 
 - [ ] **Step 4: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java
 git commit -m "feat(app): haptic tick on a newly pressed on-screen control
 
 Fires performHapticFeedback only when a touch introduces a key bit not already
@@ -458,7 +458,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 With the physical device connected and a ROM running:
 ```sh
-adb install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+adb install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
 ```
 Confirm, capturing screenshots where visual:
 1. **Crisp pixels:** the game image has hard pixel edges (no blur); compare a zoomed screenshot of text/sprites against the pre-Phase-2 look.

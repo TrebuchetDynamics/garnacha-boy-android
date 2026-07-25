@@ -12,7 +12,7 @@ Garnacha Boy has three distinct native-code improvement tracks:
 2. keep the mGBA JNI boundary small and testable;
 3. benchmark and optimize only measured runtime bottlenecks.
 
-This specification covers only track 1. The primary Android adapter is currently a single 500-line file, `mgba-android/core/src/main/cpp/mgba_android.c`, containing both JNI conversion and mGBA session ownership. Android instrumentation covers successful runtime behavior, but the adapter's ownership and failure paths cannot be exercised directly by host sanitizers.
+This specification covers only track 1. The primary Android adapter is currently a single 500-line file, `android/core/src/main/cpp/mgba_android.c`, containing both JNI conversion and mGBA session ownership. Android instrumentation covers successful runtime behavior, but the adapter's ownership and failure paths cannot be exercised directly by host sanitizers.
 
 ## Goals
 
@@ -35,9 +35,9 @@ This specification covers only track 1. The primary Android adapter is currently
 
 Extract one pure-C session module and leave a thin JNI wrapper:
 
-- `mgba-android/core/src/main/cpp/mgba_session.h`
-- `mgba-android/core/src/main/cpp/mgba_session.c`
-- `mgba-android/core/src/main/cpp/mgba_android.c`
+- `android/core/src/main/cpp/mgba_session.h`
+- `android/core/src/main/cpp/mgba_session.c`
+- `android/core/src/main/cpp/mgba_android.c`
 
 The session module owns core lifecycle and emulator operations. The JNI file owns only Java handles, strings, primitive arrays, JNI exception checks, and conversion to the existing Java return contract. `vendor/mgba` remains untouched.
 
@@ -94,9 +94,9 @@ No mGBA internals or session fields remain in the JNI file.
 
 ### Build files
 
-`mgba-android/core/CMakeLists.txt` compiles `mgba_session.c` and `mgba_android.c` into `libmgba-android.so`.
+`android/core/CMakeLists.txt` compiles `mgba_session.c` and `mgba_android.c` into `libmgba-android.so`.
 
-`mgba-android/smoke/CMakeLists.txt` builds the session module into a host test target with both GB and GBA cores enabled. Product-owned C targets compile with `-Wall -Wextra -Werror` on Clang and GCC; warning policy does not apply to vendored mGBA.
+`android/smoke/CMakeLists.txt` builds the session module into a host test target with both GB and GBA cores enabled. Product-owned C targets compile with `-Wall -Wextra -Werror` on Clang and GCC; warning policy does not apply to vendored mGBA.
 
 ## Lifecycle and data flow
 
@@ -179,7 +179,7 @@ Do not add an allocator shim solely to force `malloc` failures. Allocation branc
 Run all of the following:
 
 ```sh
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja \
+cmake -S android/smoke -B build/mgba-smoke -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug \
   -DGARNACHA_SANITIZERS=ON
 cmake --build build/mgba-smoke
@@ -187,14 +187,14 @@ ctest --test-dir build/mgba-smoke --output-on-failure
 
 # Existing benchmark remains executable; this slice makes no speed claim.
 build/mgba-smoke/mgba-core-benchmark \
-  mgba-android/core/src/androidTest/assets/hello.gba 30000
+  android/core/src/androidTest/assets/hello.gba 30000
 
-mgba-android/gradlew -p mgba-android clean lintDebug \
+android/gradlew -p android clean lintDebug \
   :app:testDebugUnitTest :app:assembleBenchmark \
   :core:assembleBenchmark :core:assembleDebugAndroidTest
 
 : "${ANDROID_SERIAL:?Set ANDROID_SERIAL to the target emulator or device serial}"
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :core:connectedDebugAndroidTest
 ```
 

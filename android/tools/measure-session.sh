@@ -6,9 +6,9 @@
 # MgbaPerf windows survive in logcat's ring buffer, gfxinfo accumulates inside
 # the app process, and battery/thermal read accurately the moment USB is back.
 #
-#   mgba-android/tools/measure-session.sh start
+#   android/tools/measure-session.sh start
 #     ... unplug USB, play for 30-60 min, keep the screen on, replug ...
-#   mgba-android/tools/measure-session.sh collect "Minish Cap"
+#   android/tools/measure-session.sh collect "Minish Cap"
 #
 # If the host and device share a LAN, wireless debugging (adb pair/connect)
 # works too and `collect` can then be run without replugging.
@@ -208,7 +208,7 @@ start)
     echo "Counters reset (gfxinfo, batterystats, logcat 32M). Screen timeout 1h."
     echo
     echo "NOW: unplug USB, play for 30-60 min (keep the screen on), then replug"
-    echo "and run: mgba-android/tools/measure-session.sh collect \"<title>\""
+    echo "and run: android/tools/measure-session.sh collect \"<title>\""
     ;;
 
 collect)

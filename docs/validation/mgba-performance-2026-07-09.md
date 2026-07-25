@@ -13,7 +13,7 @@ The objective is to find concrete ways to improve the custom Android app's perfo
 
 The only installable custom APK previously built by CI was the Android `debug` variant. Its generated arm64 compile command contains `-O0` for both the adapter and canonical mGBA. That is appropriate for source debugging but not for gameplay or performance testing.
 
-`benchmark` build types now exist in both `mgba-android/app/build.gradle` and `mgba-android/core/build.gradle`. The app variant:
+`benchmark` build types now exist in both `android/app/build.gradle` and `android/core/build.gradle`. The app variant:
 
 - is non-debuggable;
 - maps the native build to CMake `RelWithDebInfo` and `-O2`;
@@ -31,20 +31,20 @@ The optimized APK is 600,164 bytes (20.7%) smaller.
 
 ## Reproducible core measurement
 
-`mgba-android/smoke/mgba_core_benchmark.c` runs a selected ROM for a requested frame count without real-time pacing. It is a diagnostic executable, not a timing gate: shared CI hosts and thermally constrained devices are too noisy for a hard microsecond threshold.
+`android/smoke/mgba_core_benchmark.c` runs a selected ROM for a requested frame count without real-time pacing. It is a diagnostic executable, not a timing gate: shared CI hosts and thermally constrained devices are too noisy for a hard microsecond threshold.
 
 ```sh
-cmake -S mgba-android/smoke -B /tmp/mgba-smoke-debug -G Ninja \
+cmake -S android/smoke -B /tmp/mgba-smoke-debug -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug
 cmake --build /tmp/mgba-smoke-debug
-cmake -S mgba-android/smoke -B /tmp/mgba-smoke-release -G Ninja \
+cmake -S android/smoke -B /tmp/mgba-smoke-release -G Ninja \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build /tmp/mgba-smoke-release
 
 /tmp/mgba-smoke-debug/mgba-core-benchmark \
-  mgba-android/core/src/androidTest/assets/hello.gba 30000
+  android/core/src/androidTest/assets/hello.gba 30000
 /tmp/mgba-smoke-release/mgba-core-benchmark \
-  mgba-android/core/src/androidTest/assets/hello.gba 30000
+  android/core/src/androidTest/assets/hello.gba 30000
 ```
 
 Two alternating host samples produced:

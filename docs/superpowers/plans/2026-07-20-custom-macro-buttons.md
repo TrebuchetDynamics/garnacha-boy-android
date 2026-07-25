@@ -28,21 +28,21 @@
 
 **Create**
 
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MacroControls.java` — pure macro definition, validation, labels, stable layout IDs, copy, and serialization.
-- `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/MacroControlsTest.java` — model and persistence contract.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MacroControls.java` — pure macro definition, validation, labels, stable layout IDs, copy, and serialization.
+- `android/app/src/test/java/com/trebuchetdynamics/emulator/app/MacroControlsTest.java` — model and persistence contract.
 
 **Modify**
 
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java` — macro geometry, distinct layout IDs, and normal/Turbo hit channels.
-- `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java` — geometry, overrides, and channel separation.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java` — pure Turbo cadence.
-- `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java` — cadence and held-input behavior.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java` — portrait/landscape macro preferences and one-editor transaction.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java` — active macro set, separate touch channels, macro rendering, and frame-resolved keys.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java` — request frame-resolved input.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java` — load saved macro sets into play and refresh them after editing.
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java` — Add dialog, selection, deletion, reset, and transactional save.
-- `mgba-android/app/src/main/res/values/strings.xml` — macro editor labels, validation, and accessibility copy.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java` — macro geometry, distinct layout IDs, and normal/Turbo hit channels.
+- `android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java` — geometry, overrides, and channel separation.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java` — pure Turbo cadence.
+- `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java` — cadence and held-input behavior.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java` — portrait/landscape macro preferences and one-editor transaction.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java` — active macro set, separate touch channels, macro rendering, and frame-resolved keys.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java` — request frame-resolved input.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java` — load saved macro sets into play and refresh them after editing.
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java` — Add dialog, selection, deletion, reset, and transactional save.
+- `android/app/src/main/res/values/strings.xml` — macro editor labels, validation, and accessibility copy.
 - `docs/design/pizzaboy-live/play-store-listing-study.md` — record the implemented customization capability without claiming skins or scripting.
 
 ---
@@ -50,8 +50,8 @@
 ### Task 1: Pure Macro Definition and Serialization
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MacroControls.java`
-- Create: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/MacroControlsTest.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MacroControls.java`
+- Create: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/MacroControlsTest.java`
 
 **Interfaces:**
 - Consumes: mGBA `KEY_*` compile-time constants from `MgbaSession`.
@@ -150,7 +150,7 @@ public class MacroControlsTest {
 Run:
 
 ```bash
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest \
+android/gradlew -p android :app:testDebugUnitTest \
   --tests com.trebuchetdynamics.emulator.app.MacroControlsTest
 ```
 
@@ -330,8 +330,8 @@ Expected: all `MacroControlsTest` methods pass.
 - [ ] **Step 5: Commit only in a clean isolated worktree**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MacroControls.java \
-  mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/MacroControlsTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/MacroControls.java \
+  android/app/src/test/java/com/trebuchetdynamics/emulator/app/MacroControlsTest.java
 git commit -m "feat(android): add macro control model"
 ```
 
@@ -342,8 +342,8 @@ Expected: one model-only commit. In the current dirty worktree, skip this comman
 ### Task 2: Macro Geometry and Separate Hit Channels
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java`
-- Modify: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java`
+- Modify: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java`
 
 **Interfaces:**
 - Consumes: `MacroControls.values()`, `Macro.layoutId()`, `Macro.keyMask`, and `Macro.turbo`.
@@ -402,7 +402,7 @@ private static ControlLayout.Control controlById(ControlLayout layout, int id) {
 - [ ] **Step 2: Run focused tests and verify RED**
 
 ```bash
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest \
+android/gradlew -p android :app:testDebugUnitTest \
   --tests com.trebuchetdynamics.emulator.app.ControlLayoutTest.macroUsesStableLayoutIdAndOverride \
   --tests com.trebuchetdynamics.emulator.app.ControlLayoutTest.normalAndTurboMacrosUseSeparateChannels
 ```
@@ -528,7 +528,7 @@ will use the separate channels in Task 4.
 - [ ] **Step 6: Run all ControlLayout tests**
 
 ```bash
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest \
+android/gradlew -p android :app:testDebugUnitTest \
   --tests com.trebuchetdynamics.emulator.app.ControlLayoutTest
 ```
 
@@ -537,8 +537,8 @@ Expected: all old stock-layout tests and both macro tests pass.
 - [ ] **Step 7: Commit only in a clean isolated worktree**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
-  mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java \
+  android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlLayoutTest.java
 git commit -m "feat(android): add macro control geometry"
 ```
 
@@ -549,7 +549,7 @@ In the current dirty worktree, skip this command.
 ### Task 3: Per-Orientation Persistence and Atomic Editor Save
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java`
 
 **Interfaces:**
 - Consumes: `MacroControls.parse(String)` and `serialize()`.
@@ -596,7 +596,7 @@ migrated. Do not change existing preference names or defaults.
 - [ ] **Step 3: Compile the app**
 
 ```bash
-mgba-android/gradlew -p mgba-android :app:compileDebugJavaWithJavac
+android/gradlew -p android :app:compileDebugJavaWithJavac
 ```
 
 Expected: `BUILD SUCCESSFUL`.
@@ -604,7 +604,7 @@ Expected: `BUILD SUCCESSFUL`.
 - [ ] **Step 4: Commit only in a clean isolated worktree**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java
 git commit -m "feat(android): persist macro layouts per orientation"
 ```
 
@@ -615,11 +615,11 @@ In the current dirty worktree, skip this command.
 ### Task 4: Turbo Cadence and Play-Screen Input
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java`
-- Modify: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java`
+- Modify: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
 
 **Interfaces:**
 - Consumes: `ControlLayout.Input`, saved portrait/landscape `MacroControls`.
@@ -650,7 +650,7 @@ Append to `FeelMathTest`:
 - [ ] **Step 2: Run cadence tests and verify RED**
 
 ```bash
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest \
+android/gradlew -p android :app:testDebugUnitTest \
   --tests com.trebuchetdynamics.emulator.app.FeelMathTest.turboPulsesWholeCombinationTwoFramesOnTwoFramesOff \
   --tests com.trebuchetdynamics.emulator.app.FeelMathTest.normalKeysRemainHeldWhileTurboPulses
 ```
@@ -789,7 +789,7 @@ emulatorView.setControlLayouts(
 - [ ] **Step 9: Run focused and full unit tests**
 
 ```bash
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest \
+android/gradlew -p android :app:testDebugUnitTest \
   --tests com.trebuchetdynamics.emulator.app.FeelMathTest \
   --tests com.trebuchetdynamics.emulator.app.ControlLayoutTest
 ```
@@ -799,11 +799,11 @@ Expected: all cadence, stock-control, and macro channel tests pass.
 - [ ] **Step 10: Commit only in a clean isolated worktree**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java \
-  mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java \
+  android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java \
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java \
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
 git commit -m "feat(android): run touch macro buttons"
 ```
 
@@ -814,8 +814,8 @@ In the current dirty worktree, skip this command.
 ### Task 5: Smart Add/Delete Layout Editor
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java`
-- Modify: `mgba-android/app/src/main/res/values/strings.xml`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java`
+- Modify: `android/app/src/main/res/values/strings.xml`
 
 **Interfaces:**
 - Consumes: `MacroControls` working copy, macro-aware `ControlLayout.of`, and `Settings.setControlLayout`.
@@ -1101,7 +1101,7 @@ content descriptions. Newly added macro selection announces, for example,
 - [ ] **Step 8: Run unit, lint, and assemble checks**
 
 ```bash
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
 ```
 
@@ -1110,10 +1110,10 @@ Expected: all tests pass, lint writes no errors, and debug APK assembles.
 - [ ] **Step 9: Commit only in a clean isolated worktree**
 
 ```bash
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java \
-  mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlOverrides.java \
-  mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlOverridesTest.java \
-  mgba-android/app/src/main/res/values/strings.xml
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java \
+  android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlOverrides.java \
+  android/app/src/test/java/com/trebuchetdynamics/emulator/app/ControlOverridesTest.java \
+  android/app/src/main/res/values/strings.xml
 git commit -m "feat(android): edit custom macro buttons"
 ```
 
@@ -1141,7 +1141,7 @@ Do not claim Pizza Boy assets, skins, or trade dress.
 
 ```bash
 git diff --check
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :app:testDebugUnitTest :app:lintDebug :app:assembleDebug
 ```
 
@@ -1153,12 +1153,12 @@ Use the repository’s existing host and device paths rather than adding a macro
 JNI test, because macros resolve to the existing key bitmask before JNI:
 
 ```bash
-cmake -S mgba-android/smoke -B mgba-android/smoke/build \
+cmake -S android/smoke -B android/smoke/build \
   -DCMAKE_BUILD_TYPE=Debug -DENABLE_SANITIZERS=ON
-cmake --build mgba-android/smoke/build
-ctest --test-dir mgba-android/smoke/build --output-on-failure
+cmake --build android/smoke/build
+ctest --test-dir android/smoke/build --output-on-failure
 
-mgba-android/gradlew -p mgba-android \
+android/gradlew -p android \
   :core:connectedDebugAndroidTest
 ```
 
@@ -1169,7 +1169,7 @@ Expected: host smoke suite and connected core instrumentation pass unchanged.
 Install:
 
 ```bash
-adb install -r mgba-android/app/build/outputs/apk/debug/app-debug.apk
+adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 ```
 
 Verify in portrait and landscape:

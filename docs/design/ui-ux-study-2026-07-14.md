@@ -73,7 +73,7 @@ gone again.
 ## Part 2 — Lemuroid live study (device reference)
 
 Lemuroid 1.17.0, installed on SM-S928B. Findings from the on-device Maestro tour
-are appended here (see the Maestro flows under `mgba-android/tools/ui-study/`).
+are appended here (see the Maestro flows under `android/tools/ui-study/`).
 Lemuroid's relevant conventions to note:
 - Library-first entry (grid of games) rather than a single-ROM screen — this is
   the M4 direction, worth seeing live.

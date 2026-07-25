@@ -6,7 +6,7 @@
 
 **Architecture:** A thin `Settings` class wraps `SharedPreferences` with typed getters/setters and pure, JVM-tested clamp/enum helpers. A programmatic grouped `SettingsActivity` (no `androidx.preference` dependency — matching the codebase's build-Views-in-code pattern used by `LibraryActivity`/`NoticesActivity`) reads and writes it. The settings are applied by `MainActivity` on resume: it sets the requested orientation, pushes control settings (haptics, idle opacity, scale mode) into `EmulatorView`, and constructs `EmulationRunner` with a small playback config (fast-forward speed, audio enable, volume). Two pure helpers are added to already-tested classes: `FeelMath.fitScale` (aspect-fill, the non-integer scale option) and a fast-forward-speed parameter on `EmulationRunner.frameBudgetNanos`.
 
-**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), `SharedPreferences`, programmatic Views, `AudioTrack`, JUnit 4 (JVM), Gradle via `mgba-android/gradlew`.
+**Tech Stack:** Android (Java, minSdk 24, targetSdk 35), `SharedPreferences`, programmatic Views, `AudioTrack`, JUnit 4 (JVM), Gradle via `android/gradlew`.
 
 ## Global Constraints
 
@@ -56,10 +56,10 @@ Package for all `.../app/` files: `com.trebuchetdynamics.emulator.app`.
 ### Task 1: Pure additions — aspect-fill scaling and speed-parameterized frame budget
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java`
-- Modify: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- Modify: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java`
+- Modify: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- Modify: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java`
 
 **Interfaces:**
 - Consumes: existing `FeelMath.Box`, `FeelMath.integerScale`, `EmulationRunner.frameBudgetNanos(boolean)`.
@@ -110,7 +110,7 @@ In `EmulationRunnerTest.java`, replace the two existing `frameBudgetNanos` tests
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*FeelMathTest' --tests '*EmulationRunnerTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*FeelMathTest' --tests '*EmulationRunnerTest'
 ```
 Expected: FAIL — `fitScale` missing; `frameBudgetNanos(boolean,int)` missing.
 
@@ -153,17 +153,17 @@ In `EmulationRunner.java`:
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*FeelMathTest' --tests '*EmulationRunnerTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*FeelMathTest' --tests '*EmulationRunnerTest'
 ```
 Expected: PASS.
 
 - [ ] **Step 6: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/FeelMath.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/FeelMathTest.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/EmulationRunnerTest.java
 git commit -m "feat(app): aspect-fill scaling and configurable fast-forward speed
 
 FeelMath.fitScale is the non-integer scale option; frameBudgetNanos takes the
@@ -178,8 +178,8 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 2: Settings store
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java`
-- Test: `mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java`
+- Test: `android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java`
 
 **Interfaces:**
 - Produces:
@@ -227,7 +227,7 @@ public class SettingsTest {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*SettingsTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*SettingsTest'
 ```
 Expected: FAIL — `Settings` missing.
 
@@ -352,15 +352,15 @@ final class Settings {
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android :app:testDebugUnitTest --tests '*SettingsTest'
+android/gradlew -p android :app:testDebugUnitTest --tests '*SettingsTest'
 ```
 Expected: PASS (3 tests).
 
 - [ ] **Step 5: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java \
-        mgba-android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java \
+        android/app/src/test/java/com/trebuchetdynamics/emulator/app/SettingsTest.java
 git commit -m "feat(app): typed Settings store over SharedPreferences
 
 Video/audio/controls/emulation preferences with defaults reproducing current
@@ -374,12 +374,12 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 3: SettingsActivity — the settings screen, reachable and editable
 
 **Files:**
-- Create: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
-- Modify: `mgba-android/app/src/main/AndroidManifest.xml`
-- Modify: `mgba-android/app/src/main/res/values/strings.xml`
+- Create: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/AndroidManifest.xml`
+- Modify: `android/app/src/main/res/values/strings.xml`
 
 **Interfaces:**
 - Consumes: `Settings` (Task 2).
@@ -653,19 +653,19 @@ In `MainActivity.java`, the `InGameMenuView.Listener` anonymous implementation g
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass. The settings screen opens from the library and the in-game menu and persists changes (its effect on a running game is Task 4). `Switch` may raise a lint deprecation warning (use `SwitchCompat` only if the project already depends on appcompat — it does not — so `Switch` is correct here and any such warning is acceptable, not an error).
 
 - [ ] **Step 7: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
-        mgba-android/app/src/main/AndroidManifest.xml \
-        mgba-android/app/src/main/res/values/strings.xml
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/SettingsActivity.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/LibraryActivity.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/InGameMenuView.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java \
+        android/app/src/main/AndroidManifest.xml \
+        android/app/src/main/res/values/strings.xml
 git commit -m "feat(app): settings screen reachable from library and in-game menu
 
 Programmatic grouped SettingsActivity (video/audio/controls/emulation) that
@@ -679,9 +679,9 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ### Task 4: Apply the settings to the running player
 
 **Files:**
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
-- Modify: `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- Modify: `android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java`
 
 **Interfaces:**
 - Consumes: `Settings` (Task 2), `FeelMath.fitScale` (Task 1), `EmulationRunner.frameBudgetNanos(boolean,int)` (Task 1).
@@ -798,16 +798,16 @@ as the last three constructor arguments (after the `StateListener`).
 
 Run:
 ```sh
-mgba-android/gradlew -p mgba-android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
+android/gradlew -p android lintDebug :app:assembleBenchmark :app:testDebugUnitTest
 ```
 Expected: BUILD SUCCESSFUL, 0 lint errors, all unit tests pass. Defaults reproduce prior behavior; changing a setting and returning to the game applies it.
 
 - [ ] **Step 5: Commit**
 
 ```sh
-git add mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java \
-        mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
+git add android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java \
+        android/app/src/main/java/com/trebuchetdynamics/emulator/app/MainActivity.java
 git commit -m "feat(app): apply settings to the running player
 
 MainActivity re-applies orientation, control haptics/opacity/scale, and audio
@@ -835,9 +835,9 @@ The physical device's foreground contention has blocked prior verification; use 
 $ANDROID_HOME/emulator/emulator -avd game-emulator-mvp -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect &
 adb -s emulator-5554 wait-for-device
 # wait for sys.boot_completed == 1, then:
-adb -s emulator-5554 install -r mgba-android/app/build/outputs/apk/benchmark/app-benchmark.apk
+adb -s emulator-5554 install -r android/app/build/outputs/apk/benchmark/app-benchmark.apk
 ```
-Import a ROM (push the MIT `mgba-android/core/src/androidTest/assets/hello.gba` to `/sdcard/Download` and pick it), then, capturing screenshots:
+Import a ROM (push the MIT `android/core/src/androidTest/assets/hello.gba` to `/sdcard/Download` and pick it), then, capturing screenshots:
 1. **Reachable:** open Settings from the library header; confirm the four groups (Video, Audio, Controls, Emulation) and all seven rows render.
 2. **Orientation:** set Orientation → Landscape; confirm the player opens landscape; set back to Auto.
 3. **Fast-forward speed:** set 2×; in game, toggle fast-forward from the menu; confirm the game runs ~2× (the `MgbaPerf` logcat `frames=` per 10 s window roughly doubles vs normal, not quadruples).

@@ -63,14 +63,14 @@ jobs:
           done
           echo "${KEYSTORE_BASE64}" | base64 -d > "${RUNNER_TEMP}/garnacha-release.jks"
           test -s "${RUNNER_TEMP}/garnacha-release.jks"
-          # build.gradle reads mgba-android/app/keystore.properties (gitignored);
+          # build.gradle reads android/app/keystore.properties (gitignored);
           # write the CI copy pointing at the restored key.
           {
             echo "storeFile=${RUNNER_TEMP}/garnacha-release.jks"
             echo "storePassword=${STORE_PASSWORD}"
             echo "keyAlias=${KEY_ALIAS}"
             echo "keyPassword=${KEY_PASSWORD}"
-          } > mgba-android/app/keystore.properties
+          } > android/app/keystore.properties
 
       - name: Build the signed release APK
         run: |
@@ -78,7 +78,7 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           GARNACHA_VERSION_NAME="${VERSION}" \
           GARNACHA_VERSION_CODE="${GITHUB_RUN_NUMBER}" \
-          mgba-android/gradlew -p mgba-android \
+          android/gradlew -p android \
             lintDebug :app:testDebugUnitTest :app:assembleRelease
 
       - name: Verify the APK is signed with the expected key
@@ -87,7 +87,7 @@ jobs:
           STORE_PASSWORD: ${{ secrets.GARNACHA_KEYSTORE_PASSWORD }}
         run: |
           set -euo pipefail
-          APK=mgba-android/app/build/outputs/apk/release/app-release.apk
+          APK=android/app/build/outputs/apk/release/app-release.apk
           if [ ! -f "${APK}" ]; then
             echo "::error::release APK missing — the build did not produce a signed, release-key artifact."
             exit 1
@@ -114,7 +114,7 @@ jobs:
         if: always()
         run: |
           shred -u "${RUNNER_TEMP}/garnacha-release.jks" 2>/dev/null || true
-          shred -u mgba-android/app/keystore.properties 2>/dev/null || true
+          shred -u android/app/keystore.properties 2>/dev/null || true
 
       - name: Publish the draft release
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2

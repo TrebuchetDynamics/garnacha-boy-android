@@ -2,8 +2,8 @@
 
 ## Product artifacts
 
-- APK: `mgba-android/app/build/outputs/apk/debug/app-debug.apk` — 2,884,656 bytes
-- AAR: `mgba-android/core/build/outputs/aar/core-debug.aar` — 639,607 bytes
+- APK: `android/app/build/outputs/apk/debug/app-debug.apk` — 2,884,656 bytes
+- AAR: `android/core/build/outputs/aar/core-debug.aar` — 639,607 bytes
 - package: `com.trebuchetdynamics.mgba`, target API 35
 - native ABIs: `arm64-v8a`, `x86_64`
 - core: canonical mGBA `0.10.5` / `26b7884bc25a5933960f3cdcd98bac1ae14d42e2`
@@ -11,7 +11,7 @@
 ## Automated receipts
 
 ```text
-mgba-android/gradlew -p mgba-android clean lintDebug \
+android/gradlew -p android clean lintDebug \
   :app:assembleDebug :core:assembleDebug :core:assembleDebugAndroidTest
 BUILD SUCCESSFUL
 app lint: 0 errors, 1 target-API warning because SDK 36 is locally installed
@@ -19,7 +19,7 @@ core lint: No issues found
 ```
 
 ```text
-ANDROID_SERIAL=emulator-5556 mgba-android/gradlew -p mgba-android \
+ANDROID_SERIAL=emulator-5556 android/gradlew -p android \
   :core:connectedDebugAndroidTest
 Starting 4 tests on game-emulator-mvp(AVD) - 14
 Finished 4 tests on game-emulator-mvp(AVD) - 14

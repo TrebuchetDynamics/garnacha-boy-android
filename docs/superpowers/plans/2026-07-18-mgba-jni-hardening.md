@@ -22,23 +22,23 @@
 
 ## File Map
 
-- Create `mgba-android/core/src/main/cpp/mgba_session.h`: opaque pure-C session API and ownership contract.
-- Create `mgba-android/core/src/main/cpp/mgba_session.c`: mGBA lifecycle, ROM ownership, frame/audio conversion, state, reset, palette, and savedata.
-- Modify `mgba-android/core/src/main/cpp/mgba_android.c`: JNI-only translation layer.
-- Create `mgba-android/smoke/mgba_session_test.c`: framework-free host regression test.
-- Modify `mgba-android/smoke/CMakeLists.txt`: GB-enabled host session target, strict warnings, sanitizer option, and CTest registration.
-- Modify `mgba-android/core/CMakeLists.txt`: compile both product C files with strict warnings.
-- Modify `mgba-android/README.md`: document sanitizer validation command.
+- Create `android/core/src/main/cpp/mgba_session.h`: opaque pure-C session API and ownership contract.
+- Create `android/core/src/main/cpp/mgba_session.c`: mGBA lifecycle, ROM ownership, frame/audio conversion, state, reset, palette, and savedata.
+- Modify `android/core/src/main/cpp/mgba_android.c`: JNI-only translation layer.
+- Create `android/smoke/mgba_session_test.c`: framework-free host regression test.
+- Modify `android/smoke/CMakeLists.txt`: GB-enabled host session target, strict warnings, sanitizer option, and CTest registration.
+- Modify `android/core/CMakeLists.txt`: compile both product C files with strict warnings.
+- Modify `android/README.md`: document sanitizer validation command.
 
 ---
 
 ### Task 1: Extract lifecycle and transactional ROM loading
 
 **Files:**
-- Create: `mgba-android/core/src/main/cpp/mgba_session.h`
-- Create: `mgba-android/core/src/main/cpp/mgba_session.c`
-- Create: `mgba-android/smoke/mgba_session_test.c`
-- Modify: `mgba-android/smoke/CMakeLists.txt`
+- Create: `android/core/src/main/cpp/mgba_session.h`
+- Create: `android/core/src/main/cpp/mgba_session.c`
+- Create: `android/smoke/mgba_session_test.c`
+- Modify: `android/smoke/CMakeLists.txt`
 
 **Interfaces:**
 - Consumes: mGBA `mCore`, `VFile`, config, GB, and GBA APIs.
@@ -53,7 +53,7 @@
 
 - [ ] **Step 1: Write the complete public C header**
 
-Create `mgba-android/core/src/main/cpp/mgba_session.h`:
+Create `android/core/src/main/cpp/mgba_session.h`:
 
 ```c
 #ifndef GARNACHA_MGBA_SESSION_H
@@ -107,7 +107,7 @@ bool mgba_session_restore_savedata(MgbaSession* session, const void* data, size_
 
 - [ ] **Step 2: Write the failing lifecycle/ROM host test**
 
-Create `mgba-android/smoke/mgba_session_test.c` with only the first task's tests:
+Create `android/smoke/mgba_session_test.c` with only the first task's tests:
 
 ```c
 #include "mgba_session.h"
@@ -243,7 +243,7 @@ int main(int argc, char** argv) {
 
 - [ ] **Step 3: Add the failing host target**
 
-Replace `mgba-android/smoke/CMakeLists.txt` with:
+Replace `android/smoke/CMakeLists.txt` with:
 
 ```cmake
 cmake_minimum_required(VERSION 3.22.1)
@@ -293,7 +293,7 @@ Run:
 
 ```sh
 rm -rf build/mgba-smoke
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake -S android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Debug
 cmake --build build/mgba-smoke
 ```
 
@@ -301,7 +301,7 @@ Expected: CMake generation fails because `mgba_session.c` does not exist yet, pr
 
 - [ ] **Step 5: Implement lifecycle and ROM loading**
 
-Create `mgba-android/core/src/main/cpp/mgba_session.c`:
+Create `android/core/src/main/cpp/mgba_session.c`:
 
 ```c
 #include "mgba_session.h"
@@ -513,7 +513,7 @@ int mgba_session_video_height(const MgbaSession* session) {
 Run:
 
 ```sh
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Debug
+cmake -S android/smoke -B build/mgba-smoke -G Ninja -DCMAKE_BUILD_TYPE=Debug
 cmake --build build/mgba-smoke
 ctest --test-dir build/mgba-smoke --output-on-failure
 ```
@@ -523,10 +523,10 @@ Expected: `mgba-core-smoke` and `mgba-session-test` pass; output includes `mGBA 
 - [ ] **Step 7: Commit only Task 1 files**
 
 ```sh
-git add mgba-android/core/src/main/cpp/mgba_session.h \
-  mgba-android/core/src/main/cpp/mgba_session.c \
-  mgba-android/smoke/mgba_session_test.c \
-  mgba-android/smoke/CMakeLists.txt
+git add android/core/src/main/cpp/mgba_session.h \
+  android/core/src/main/cpp/mgba_session.c \
+  android/smoke/mgba_session_test.c \
+  android/smoke/CMakeLists.txt
 git diff --cached --name-only
 git commit -m "refactor(core): extract mGBA session lifecycle"
 ```
@@ -538,8 +538,8 @@ Expected staged list: exactly the four files above.
 ### Task 2: Move frame, state, reset, palette, and savedata behavior into the session
 
 **Files:**
-- Modify: `mgba-android/core/src/main/cpp/mgba_session.c`
-- Modify: `mgba-android/smoke/mgba_session_test.c`
+- Modify: `android/core/src/main/cpp/mgba_session.c`
+- Modify: `android/smoke/mgba_session_test.c`
 
 **Interfaces:**
 - Consumes: Task 1's opaque `MgbaSession` lifecycle and ROM ownership.
@@ -547,7 +547,7 @@ Expected staged list: exactly the four files above.
 
 - [ ] **Step 1: Add failing session-operation tests**
 
-Add `#include <string.h>` to the test file's top include block, then insert these functions before `main` in `mgba-android/smoke/mgba_session_test.c`:
+Add `#include <string.h>` to the test file's top include block, then insert these functions before `main` in `android/smoke/mgba_session_test.c`:
 
 ```c
 static void test_frame_validation_and_output(const char* gba_path) {
@@ -679,7 +679,7 @@ Expected: undefined references to `mgba_session_run_frame`, `mgba_session_save_s
 
 - [ ] **Step 3: Implement the remaining session operations**
 
-Append to `mgba-android/core/src/main/cpp/mgba_session.c`:
+Append to `android/core/src/main/cpp/mgba_session.c`:
 
 ```c
 int mgba_session_run_frame(MgbaSession* session,
@@ -816,8 +816,8 @@ Expected: both CTest tests pass and the session test prints `mGBA session lifecy
 - [ ] **Step 5: Commit Task 2**
 
 ```sh
-git add mgba-android/core/src/main/cpp/mgba_session.c \
-  mgba-android/smoke/mgba_session_test.c
+git add android/core/src/main/cpp/mgba_session.c \
+  android/smoke/mgba_session_test.c
 git diff --cached --name-only
 git commit -m "test(core): cover native session operations"
 ```
@@ -829,8 +829,8 @@ Expected staged list: exactly the two files above.
 ### Task 3: Replace mGBA logic in the JNI file with session delegation
 
 **Files:**
-- Modify: `mgba-android/core/src/main/cpp/mgba_android.c`
-- Modify: `mgba-android/core/CMakeLists.txt`
+- Modify: `android/core/src/main/cpp/mgba_android.c`
+- Modify: `android/core/CMakeLists.txt`
 
 **Interfaces:**
 - Consumes: the complete `mgba_session.h` API from Tasks 1–2.
@@ -838,7 +838,7 @@ Expected staged list: exactly the two files above.
 
 - [ ] **Step 1: Replace `mgba_android.c` with a thin JNI wrapper**
 
-Rewrite `mgba-android/core/src/main/cpp/mgba_android.c` so it contains no `struct MgbaSession` definition and no direct `mCore` operations. Use this complete structure and preserve every JNI symbol exactly:
+Rewrite `android/core/src/main/cpp/mgba_android.c` so it contains no `struct MgbaSession` definition and no direct `mCore` operations. Use this complete structure and preserve every JNI symbol exactly:
 
 ```c
 /* MIT-licensed JNI adapter. mGBA remains licensed under MPL-2.0. */
@@ -1071,7 +1071,7 @@ Java_com_trebuchetdynamics_emulator_mgba_MgbaSession_nativeDestroy(
 
 - [ ] **Step 2: Compile both product C files into the Android library with strict warnings**
 
-Replace the final library block in `mgba-android/core/CMakeLists.txt`:
+Replace the final library block in `android/core/CMakeLists.txt`:
 
 ```cmake
 add_library(mgba-android SHARED
@@ -1089,7 +1089,7 @@ endif()
 Run:
 
 ```sh
-mgba-android/gradlew -p mgba-android clean \
+android/gradlew -p android clean \
   :core:assembleDebug :core:assembleDebugAndroidTest
 ```
 
@@ -1101,7 +1101,7 @@ Run with a booted emulator or connected device selected through the environment:
 
 ```sh
 : "${ANDROID_SERIAL:?Set ANDROID_SERIAL to the target emulator or device serial}"
-mgba-android/gradlew -p mgba-android :core:connectedDebugAndroidTest
+android/gradlew -p android :core:connectedDebugAndroidTest
 ```
 
 Expected: all existing `MgbaCoreInstrumentedTest` methods pass, exercising every migrated JNI operation through real Java/native linkage.
@@ -1109,8 +1109,8 @@ Expected: all existing `MgbaCoreInstrumentedTest` methods pass, exercising every
 - [ ] **Step 5: Commit Task 3**
 
 ```sh
-git add mgba-android/core/src/main/cpp/mgba_android.c \
-  mgba-android/core/CMakeLists.txt
+git add android/core/src/main/cpp/mgba_android.c \
+  android/core/CMakeLists.txt
 git diff --cached --name-only
 git commit -m "refactor(core): isolate JNI from mGBA session state"
 ```
@@ -1122,8 +1122,8 @@ Expected staged list: exactly the two files above.
 ### Task 4: Add sanitizer validation and document the native gate
 
 **Files:**
-- Modify: `mgba-android/smoke/CMakeLists.txt`
-- Modify: `mgba-android/README.md`
+- Modify: `android/smoke/CMakeLists.txt`
+- Modify: `android/README.md`
 
 **Interfaces:**
 - Consumes: `garnacha-mgba-session` and `mgba-session-test` from Task 1.
@@ -1135,7 +1135,7 @@ Run:
 
 ```sh
 rm -rf build/mgba-sanitize-check
-cmake -S mgba-android/smoke -B build/mgba-sanitize-check \
+cmake -S android/smoke -B build/mgba-sanitize-check \
   -G Ninja -DGARNACHA_SANITIZERS=ON
 grep -q -- '-fsanitize=address' build/mgba-sanitize-check/build.ninja
 ```
@@ -1144,7 +1144,7 @@ Expected: grep exits `1` because the requested sanitizer flags are absent before
 
 - [ ] **Step 2: Add host-only sanitizer flags**
 
-Insert after `garnacha_strict_c` in `mgba-android/smoke/CMakeLists.txt`:
+Insert after `garnacha_strict_c` in `android/smoke/CMakeLists.txt`:
 
 ```cmake
 option(GARNACHA_SANITIZERS "Enable ASan and UBSan for product host tests" OFF)
@@ -1178,7 +1178,7 @@ Run:
 
 ```sh
 rm -rf build/mgba-smoke
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja \
+cmake -S android/smoke -B build/mgba-smoke -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug -DGARNACHA_SANITIZERS=ON
 cmake --build build/mgba-smoke
 ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
@@ -1194,21 +1194,21 @@ Run:
 
 ```sh
 build/mgba-smoke/mgba-core-benchmark \
-  mgba-android/core/src/androidTest/assets/hello.gba 30000
+  android/core/src/androidTest/assets/hello.gba 30000
 ```
 
 Expected: process exits zero and reports a positive frames-per-second result. Record the output in the execution notes; do not add a performance threshold to this hardening slice.
 
 - [ ] **Step 5: Document the sanitizer gate**
 
-Add under `## Build and test` in `mgba-android/README.md` after the existing CTest commands:
+Add under `## Build and test` in `android/README.md` after the existing CTest commands:
 
 ````markdown
 For product-owned native lifecycle checks under AddressSanitizer and
 UndefinedBehaviorSanitizer:
 
 ```sh
-cmake -S mgba-android/smoke -B build/mgba-smoke -G Ninja \
+cmake -S android/smoke -B build/mgba-smoke -G Ninja \
   -DCMAKE_BUILD_TYPE=Debug -DGARNACHA_SANITIZERS=ON
 cmake --build build/mgba-smoke
 ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
@@ -1225,7 +1225,7 @@ Android release artifacts.
 Run:
 
 ```sh
-mgba-android/gradlew -p mgba-android clean lintDebug \
+android/gradlew -p android clean lintDebug \
   :app:testDebugUnitTest :app:assembleBenchmark \
   :core:assembleBenchmark :core:assembleDebugAndroidTest
 
@@ -1237,7 +1237,7 @@ Expected: Gradle `BUILD SUCCESSFUL`, lint has zero errors, unit tests pass, benc
 - [ ] **Step 7: Commit Task 4**
 
 ```sh
-git add mgba-android/smoke/CMakeLists.txt mgba-android/README.md
+git add android/smoke/CMakeLists.txt android/README.md
 git diff --cached --name-only
 git commit -m "test(core): run session checks under sanitizers"
 ```

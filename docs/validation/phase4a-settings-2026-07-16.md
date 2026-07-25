@@ -4,7 +4,7 @@ Device: **clean x86_64 AVD** (`game-emulator-mvp`, 1080×2400) — used because 
 physical test device's foreground contention and swipe lockscreen blocked
 interactive automation across prior phases (same rationale as Phase 3).
 Build: `app-benchmark.apk` from commit `aaeb3df1`.
-Test ROM: the MIT `hello.gba` (`mgba-android/core/src/androidTest/assets/hello.gba`).
+Test ROM: the MIT `hello.gba` (`android/core/src/androidTest/assets/hello.gba`).
 
 ## Confirmed on device — every Slice A setting, end to end
 

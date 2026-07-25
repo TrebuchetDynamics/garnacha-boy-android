@@ -31,16 +31,16 @@ The implementation extends existing code rather than creating a second control
 system:
 
 - `ControlLayout` is already the single source of truth for drawn and touchable
-  controls (`mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java:20-307`).
+  controls (`android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlLayout.java:20-307`).
 - `ControlOverrides` already persists normalized position and scale by integer
-  control identity (`mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlOverrides.java:17-118`).
+  control identity (`android/app/src/main/java/com/trebuchetdynamics/emulator/app/ControlOverrides.java:17-118`).
 - `LayoutEditorView` already owns direct selection, dragging, resizing, opacity,
   reset, save, and cancellation through Back
-  (`mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java:19-271`).
+  (`android/app/src/main/java/com/trebuchetdynamics/emulator/app/LayoutEditorView.java:19-271`).
 - `EmulatorView` already combines touch and hardware input before each emulated
-  frame (`mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java:16-385`).
+  frame (`android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java:16-385`).
 - `Settings` already stores separate portrait and landscape layout records
-  (`mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java:165-174`).
+  (`android/app/src/main/java/com/trebuchetdynamics/emulator/app/Settings.java:165-174`).
 
 ## Data model
 

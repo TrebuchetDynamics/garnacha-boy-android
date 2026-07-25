@@ -7,7 +7,7 @@
 
 ## Decision
 
-Garnacha Boy has one supported emulator core: canonical mGBA under MPL-2.0. The Android application and reusable core library live under `mgba-android/`; mGBA remains an unmodified `vendor/mgba` submodule.
+Garnacha Boy has one supported emulator core: canonical mGBA under MPL-2.0. The Android application and reusable core library live under `android/`; mGBA remains an unmodified `vendor/mgba` submodule.
 
 Former secondary emulator clients and their desktop, web, libretro, and legacy Android build paths are removed. The repository no longer builds or packages a second emulator core.
 

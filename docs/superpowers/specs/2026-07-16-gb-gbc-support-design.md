@@ -58,12 +58,12 @@ with **zero regression to GBA**.
 
 ## Current state (what exists)
 
-- **Native** (`mgba-android/core/src/main/cpp/mgba_android.c`): `nativeCreate`
+- **Native** (`android/core/src/main/cpp/mgba_android.c`): `nativeCreate`
   calls `mCoreCreate(mPLATFORM_GBA)` (fixed), sets a video buffer with a fixed
   `VIDEO_STRIDE`, and hard-codes 240×160. `nativeLoadRom(byte[])` /
   `nativeLoadRomFile(path)` call `core->loadROM`. `runFrame` copies
   `session->video` to an ARGB `int[]`. `MgbaCore.canCreateGbaCore` is a JNI probe.
-- **CMake** (`mgba-android/core/CMakeLists.txt`): `M_CORE_GBA ON`, **`M_CORE_GB
+- **CMake** (`android/core/CMakeLists.txt`): `M_CORE_GBA ON`, **`M_CORE_GB
   OFF`**, `LIBMGBA_ONLY ON`; adds `vendor/mgba` as a subdirectory and links
   `mgba`.
 - **`MgbaSession`** (Java): constants `VIDEO_WIDTH=240`, `VIDEO_HEIGHT=160`,
@@ -229,10 +229,10 @@ the ROM's dimensions → `publishFrame` blits into the correctly-sized bitmap.
 
 ## Files
 
-- **Modify:** `mgba-android/core/CMakeLists.txt` (`M_CORE_GB ON`);
-  `mgba-android/core/src/main/cpp/mgba_android.c` (platform-selected core,
+- **Modify:** `android/core/CMakeLists.txt` (`M_CORE_GB ON`);
+  `android/core/src/main/cpp/mgba_android.c` (platform-selected core,
   variable video, `canCreateGbCore`);
-  `mgba-android/core/src/main/java/.../mgba/MgbaSession.java` (variable dims +
+  `android/core/src/main/java/.../mgba/MgbaSession.java` (variable dims +
   platform); `.../mgba/MgbaCore.java` (add `canCreateGbCore`).
 - **Create:** `.../app/RomSystem.java` + `RomSystemTest.java`.
 - **Modify:** `ControlLayout.java` (+ `ControlLayoutTest.java`);

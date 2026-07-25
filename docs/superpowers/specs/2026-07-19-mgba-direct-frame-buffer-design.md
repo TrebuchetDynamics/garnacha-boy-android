@@ -144,15 +144,15 @@ If any gate fails, revert the production candidate. Do not weaken the threshold,
 
 ## Expected implementation files
 
-- `mgba-android/core/src/main/cpp/mgba_session.c`
-- `mgba-android/core/src/main/cpp/mgba_session.h`
-- `mgba-android/core/src/main/cpp/mgba_android.c`
-- `mgba-android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
-- `mgba-android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
-- `mgba-android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`
-- `mgba-android/smoke/mgba_session_test.c`
-- `mgba-android/README.md` only if the benchmark procedure needs a correction
+- `android/core/src/main/cpp/mgba_session.c`
+- `android/core/src/main/cpp/mgba_session.h`
+- `android/core/src/main/cpp/mgba_android.c`
+- `android/core/src/main/java/com/trebuchetdynamics/emulator/mgba/MgbaSession.java`
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulationRunner.java`
+- `android/app/src/main/java/com/trebuchetdynamics/emulator/app/EmulatorView.java`
+- `android/core/src/androidTest/java/com/trebuchetdynamics/emulator/mgba/MgbaCoreInstrumentedTest.java`
+- `android/smoke/mgba_session_test.c`
+- `android/README.md` only if the benchmark procedure needs a correction
 
 No vendored or legacy emulator file is in scope.
 
