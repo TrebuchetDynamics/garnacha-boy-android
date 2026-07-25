@@ -14,6 +14,7 @@ name: Release
 #   GARNACHA_KEY_PASSWORD       key password
 
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
@@ -113,6 +114,7 @@ jobs:
           mv "${APK}" "garnacha-boy-${GITHUB_REF_NAME}.apk"
 
       - name: Package corresponding source
+        if: startsWith(github.ref, 'refs/tags/v')
         run: |
           set -euo pipefail
           ROOT="garnacha-boy-${GITHUB_REF_NAME}"
@@ -131,6 +133,7 @@ jobs:
           shred -u android/app/keystore.properties 2>/dev/null || true
 
       - name: Publish the draft release
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           files: |
