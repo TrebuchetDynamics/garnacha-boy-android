@@ -13,6 +13,10 @@ All notable changes to Garnacha Boy are documented here. The format follows
   MPL-2.0, added exact-source notices, and added recursive source archives to
   the release workflow.
 
+### Fixed
+- Wired production keystore properties into release builds and corrected the
+  signing-certificate fingerprint comparison used by the release workflow.
+
 ## [0.6.0] — 2026-07-24
 
 ### Added

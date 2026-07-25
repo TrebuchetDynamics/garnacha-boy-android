@@ -2,6 +2,18 @@ plugins {
     id 'com.android.application'
 }
 
+def keystorePropertiesFile = file('keystore.properties')
+def keystoreProperties = new Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+    def missing = ['storeFile', 'storePassword', 'keyAlias', 'keyPassword'].findAll {
+        !keystoreProperties.getProperty(it)
+    }
+    if (!missing.isEmpty()) {
+        throw new GradleException("Missing release signing properties: ${missing.join(', ')}")
+    }
+}
+
 android {
     namespace 'com.trebuchetdynamics.emulator.app'
     compileSdk 35
@@ -17,7 +29,23 @@ android {
         versionName System.getenv('GARNACHA_VERSION_NAME') ?: '0.1.0-dev'
     }
 
+    signingConfigs {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                storeFile file(keystoreProperties.getProperty('storeFile'))
+                storePassword keystoreProperties.getProperty('storePassword')
+                keyAlias keystoreProperties.getProperty('keyAlias')
+                keyPassword keystoreProperties.getProperty('keyPassword')
+            }
+        }
+    }
+
     buildTypes {
+        release {
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
         benchmark {
             initWith release
             signingConfig signingConfigs.debug

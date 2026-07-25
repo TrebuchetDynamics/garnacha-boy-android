@@ -102,7 +102,9 @@ jobs:
           key_fp=$(keytool -list -v \
             -keystore "${RUNNER_TEMP}/garnacha-release.jks" \
             -alias "${KEY_ALIAS}" -storepass "${STORE_PASSWORD}" 2>/dev/null \
-            | grep -i "SHA256:" | head -1 | tr -dc "0-9A-Fa-f" | tr "A-F" "a-f")
+            | grep -i "SHA256:" | head -1 \
+            | grep -oiE "([0-9a-f]{2}:){31}[0-9a-f]{2}" \
+            | tr -d ":" | tr "A-F" "a-f")
           if [ -z "${apk_fp}" ] || [ "${apk_fp}" != "${key_fp}" ]; then
             echo "::error::APK signing cert does not match the Garnacha release key."
             exit 1
